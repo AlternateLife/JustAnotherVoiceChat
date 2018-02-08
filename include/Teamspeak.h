@@ -27,12 +27,24 @@
 
 #pragma once
 
-#include "AlternateVoice.h"
-
 #include <stdint.h>
 #include <stdio.h>
 
 #include "ts3_functions.h"
+
+#ifdef _WIN32
+#ifdef ALTERNATEVOICE_EXPORTS
+#define ALTERNATEVOICE_API __declspec(dllexport)
+#else
+#define ALTERNATEVOICE_API __declspec(dllimport)
+#endif
+#else
+#define ALTERNATEVOICE_API __attribute__ ((visibility("default")))
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Required functions
 ALTERNATEVOICE_API const char* ts3plugin_name();

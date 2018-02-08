@@ -27,19 +27,6 @@
 
 #pragma once
 
-#ifdef _WIN32
-#ifdef ALTERNATEVOICE_EXPORTS
-#define ALTERNATEVOICE_API __declspec(dllexport)
-#else
-#define ALTERNATEVOICE_API __declspec(dllimport)
-#endif
-#else
-#define ALTERNATEVOICE_API __attribute__ ((visibility("default")))
-#endif
+bool AlternateVoice_Start();
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "Version.h"
-#include "Teamspeak.h"
+void AlternateVoice_Stop();
