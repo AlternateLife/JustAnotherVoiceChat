@@ -41,4 +41,5 @@
 extern "C" {
 #endif
 
+#include "Version.h"
 #include "Teamspeak.h"
