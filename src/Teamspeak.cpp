@@ -27,10 +27,6 @@
 
 #include "Teamspeak.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
