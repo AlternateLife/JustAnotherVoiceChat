@@ -1,6 +1,6 @@
 /*
- * File: AlternateVoice.cpp
- * Date: 08.02.2018
+ * File: HttpServer.h
+ * Date: 09.02.2018
  *
  * MIT License
  *
@@ -25,34 +25,24 @@
  * SOFTWARE.
  */
 
-#include "AlternateVoice.h"
+#pragma once
 
-#include <iostream>
-#include <enet/enet.h>
+#include <microhttpd.h>
 
-#include "HttpServer.h"
+class HttpServer {
+private:
+  struct MHD_Daemon *_daemon;
 
-HttpServer *httpServer = nullptr;
+public:
+  HttpServer();
+  virtual ~HttpServer();
 
-bool AlternateVoice_Start() {
-  std::cout << "AlternateVoice: init" << std::endl;
+  bool open(uint16_t port);
+  void close();
+  bool isOpen() const;
 
-  if (enet_initialize() != 0) {
-    std::cout << "AlternateVoice: Unable to initialize ENet" << std::endl;
-    return false;
-  }
-  
-  httpServer = new HttpServer();
-  httpServer->open(8080);
+private:
+  int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
 
-  return true;
-}
-
-void AlternateVoice_Stop() {
-  std::cout << "AlternateVoice: shutdown" << std::endl;
-
-  httpServer->close();
-  delete httpServer;
-
-  enet_deinitialize();
-}
+  static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
+};
