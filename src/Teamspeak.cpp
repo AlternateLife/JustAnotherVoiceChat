@@ -33,6 +33,7 @@
 
 #include <plugin_definitions.h>
 #include <microhttpd.h>
+#include <enet/enet.h>
 
 #include "Version.h"
 
@@ -84,6 +85,10 @@ int answerToConnection(void *cls, struct MHD_Connection *connection, const char 
 int ts3plugin_init() {
   std::cout << "AlternateVoice: init" << std::endl;
 
+  if (enet_initialize() != 0) {
+    std::cout << "AlternateVoice: Unable to initialize ENet" << std::endl;
+    return 0;
+  }
   
   httpDaemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, 8080, NULL, NULL, &answerToConnection, NULL, MHD_OPTION_END);
   if (httpDaemon == NULL) {
@@ -98,4 +103,6 @@ void ts3plugin_shutdown() {
   std::cout << "AlternateVoice: shutdown" << std::endl;
 
   MHD_stop_daemon(httpDaemon);
+
+  enet_deinitialize();
 }
