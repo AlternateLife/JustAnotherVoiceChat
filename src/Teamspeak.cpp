@@ -1,5 +1,5 @@
 /*
- * File: AlternateVoice.cpp
+ * File: Teamspeak.cpp
  * Date: 08.02.2018
  *
  * MIT License
@@ -25,4 +25,50 @@
  * SOFTWARE.
  */
 
-#include "AlternateVoice.h"
+#include "Teamspeak.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#include <iostream>
+
+#include "plugin_definitions.h"
+
+#define PLUGIN_API_VERSION 22;
+
+static struct TS3Functions ts3Functions;
+
+const char *ts3plugin_name() {
+  return "AlternateVoice";
+}
+
+const char *ts3plugin_version() {
+  return "1.0.0";
+}
+
+int ts3plugin_apiVersion() {
+  return PLUGIN_API_VERSION;
+}
+
+const char *ts3plugin_author() {
+  return "AlternateVoice";
+}
+
+const char *ts3plugin_description() {
+  return "3D game voice plugin for communicating with the AlternateVoice server";
+}
+
+void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
+  ts3Functions = funcs;
+}
+
+int ts3plugin_init() {
+  std::cout << "AlternateVoice: init" << std::endl;
+
+  return 0;
+}
+
+void ts3plugin_shutdown() {
+  std::cout << "AlternateVoice: shutdown" << std::endl;
+}
