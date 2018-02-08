@@ -1,0 +1,3 @@
+[submodule "thirdparty/libmicrohttpd"]
+	path = thirdparty/libmicrohttpd
+	url = https://gnunet.org/git/libmicrohttpd.git
