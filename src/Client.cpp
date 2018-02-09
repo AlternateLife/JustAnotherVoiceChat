@@ -32,6 +32,8 @@
 Client::Client() {
   _client = nullptr;
   _peer = nullptr;
+  _thread = nullptr;
+  _stopping = false;
 }
 
 Client::~Client() {
@@ -39,7 +41,7 @@ Client::~Client() {
 }
 
 bool Client::open(std::string host, uint16_t port) {
-  if (_client != nullptr) {
+  if (isOpen()) {
     return false;
   }
 
@@ -49,16 +51,78 @@ bool Client::open(std::string host, uint16_t port) {
     return false;
   }
 
+  // connect to host
+  ENetAddress address;
+  enet_address_set_host(&address, host.c_str());
+  address.port = port;
+
+  _peer = enet_host_connect(_client, &address, NETWORK_CHANNELS, 0);
+  if (_peer == NULL) {
+    enet_peer_reset(_peer);
+    enet_host_destroy(_client);
+
+    _client = nullptr;
+    _peer = nullptr;
+    return false;
+  }
+
+  _thread = new std::thread(&Client::update, this);
   return true;
 }
 
+void Client::disconnect() {
+  enet_peer_disconnect(_peer, 0);
+  _stopping = true;
+}
+
+bool Client::isOpen() const {
+  return _client != nullptr && _peer != nullptr && _stopping == false;
+}
+
 void Client::close() {
+  if (_thread != nullptr) {
+    delete _thread;
+    _thread = nullptr;
+  }
+  
   if (_client != nullptr) {
     enet_host_destroy(_client);
     _client = nullptr;
   }
+
+  if (_peer != nullptr) {
+    enet_peer_reset(_peer);
+    _peer = nullptr;
+  }
 }
 
-bool Client::isOpen() const {
-  return _client != nullptr;
+void Client::update() {
+  ENetEvent event;
+
+  while(true) {
+    if (enet_host_service(_client, &event, 1000) > 0) {
+      switch (event.type) {
+        case ENET_EVENT_TYPE_CONNECT:
+          
+          break;
+
+        case ENET_EVENT_TYPE_DISCONNECT:
+          close();
+          break;
+
+        case ENET_EVENT_TYPE_RECEIVE:
+          if (_stopping) {
+            enet_packet_destroy(event.packet);
+            break;
+          }
+
+
+          break;
+
+        default:
+
+          break;
+      }
+    }
+  }
 }

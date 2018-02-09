@@ -30,20 +30,25 @@
 #include <enet/enet.h>
 
 #include <string>
+#include <thread>
 
 class Client {
 private:
   ENetHost *_client;
   ENetPeer *_peer;
 
+  std::thread *_thread;
+  bool _stopping;
+
 public:
   Client();
   virtual ~Client();
 
   bool open(std::string host, uint16_t port);
-  void close();
+  void disconnect();
   bool isOpen() const;
 
 private:
-
+  void close();
+  void update();
 };
