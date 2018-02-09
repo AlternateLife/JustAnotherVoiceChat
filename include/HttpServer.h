@@ -44,7 +44,7 @@ public:
 
 private:
   int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
-  int sendResponse(struct MHD_Connection *connection, const char *content);
+  int sendResponse(struct MHD_Connection *connection, const char *content, unsigned int statusCode = MHD_HTTP_OK);
 
   static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
 };

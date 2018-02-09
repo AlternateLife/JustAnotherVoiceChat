@@ -27,6 +27,8 @@
 
 #include "Client.h"
 
+#include "Teamspeak.h"
+
 #define NETWORK_CHANNELS 2
 
 Client::Client() {
@@ -34,13 +36,14 @@ Client::Client() {
   _peer = nullptr;
   _thread = nullptr;
   _stopping = false;
+  _uniqueIdentifier = "";
 }
 
 Client::~Client() {
   close();
 }
 
-bool Client::open(std::string host, uint16_t port) {
+bool Client::connect(std::string host, uint16_t port, std::string uniqueIdentifier) {
   if (isOpen()) {
     return false;
   }
@@ -67,6 +70,7 @@ bool Client::open(std::string host, uint16_t port) {
   }
 
   _thread = new std::thread(&Client::update, this);
+  _uniqueIdentifier = uniqueIdentifier;
   return true;
 }
 
@@ -103,10 +107,14 @@ void Client::update() {
     if (enet_host_service(_client, &event, 1000) > 0) {
       switch (event.type) {
         case ENET_EVENT_TYPE_CONNECT:
-          
+          ts3_log("Connection established", LogLevel_DEBUG);
+
+          sendHandshake();
           break;
 
         case ENET_EVENT_TYPE_DISCONNECT:
+          ts3_log("Connection closed", LogLevel_DEBUG);
+
           close();
           break;
 
@@ -125,4 +133,8 @@ void Client::update() {
       }
     }
   }
+}
+
+void Client::sendHandshake() {
+  
 }

@@ -135,7 +135,7 @@ void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
 }
 
 int ts3plugin_init() {
-  if (AlternateVoice_Start() == false) {
+  if (AlternateVoice_start() == false) {
     return 1;
   }
 
@@ -147,7 +147,7 @@ void ts3plugin_shutdown() {
     ts3Functions.destroyServerConnectionHandler(serverConnectionHandler);
   }
 
-  AlternateVoice_Stop();
+  AlternateVoice_stop();
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {

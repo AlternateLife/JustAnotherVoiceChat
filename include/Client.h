@@ -39,16 +39,19 @@ private:
 
   std::thread *_thread;
   bool _stopping;
+  std::string _uniqueIdentifier;
 
 public:
   Client();
   virtual ~Client();
 
-  bool open(std::string host, uint16_t port);
+  bool connect(std::string host, uint16_t port, std::string uniqueIdentifier);
   void disconnect();
   bool isOpen() const;
 
 private:
   void close();
   void update();
+
+  void sendHandshake();
 };

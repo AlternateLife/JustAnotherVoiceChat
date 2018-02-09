@@ -31,6 +31,7 @@
 #include <string.h>
 
 #include "Teamspeak.h"
+#include "AlternateVoice.h"
 
 HttpServer::HttpServer() {
   _daemon = nullptr;
@@ -70,7 +71,7 @@ bool HttpServer::isOpen() const {
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
   ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
 
-  // handle query parameters
+  // get query parameters
   const char *host = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "host");
   if (host != NULL) {
     ts3_log(std::string("\tHost: ") + host, LogLevel_DEBUG);
@@ -86,14 +87,22 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
     ts3_log(std::string("\tUID: ") + uniqueIdentifier, LogLevel_DEBUG);
   }
 
+  if (host == NULL || port == NULL || uniqueIdentifier == NULL) {
+    const char *page = "<html><body>Missing parameters</body></body>";
+    return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
+  }
+
+  AlternateVoice_connect(std::string(host), std::stoi(port), std::string(uniqueIdentifier));
+
   // send response
   const char *page = "<html><body>OK</body></html>";
   return sendResponse(connection, page);
 }
 
-int HttpServer::sendResponse(struct MHD_Connection *connection, const char *page) {
+int HttpServer::sendResponse(struct MHD_Connection *connection, const char *page, unsigned int statusCode) {
   auto response = MHD_create_response_from_buffer(strlen(page), (void *)page, MHD_RESPMEM_PERSISTENT);
-  int result = MHD_queue_response(connection, MHD_HTTP_OK, response);
+  
+  int result = MHD_queue_response(connection, statusCode, response);
 
   MHD_destroy_response(response);
   return result;

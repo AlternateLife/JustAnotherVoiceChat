@@ -27,6 +27,12 @@
 
 #pragma once
 
-bool AlternateVoice_Start();
+#include <string>
 
-void AlternateVoice_Stop();
+bool AlternateVoice_start();
+
+void AlternateVoice_stop();
+
+bool AlternateVoice_connect(std::string host, uint16_t port, std::string uniqueIdentifier);
+
+void AlternateVoice_disconnect();

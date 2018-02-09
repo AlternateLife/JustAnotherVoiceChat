@@ -32,16 +32,20 @@
 
 #include "HttpServer.h"
 #include "Teamspeak.h"
+#include "Client.h"
 
 HttpServer *httpServer = nullptr;
+Client *client = nullptr;
 
-bool AlternateVoice_Start() {
+bool AlternateVoice_start() {
   ts3_log("Initialize", LogLevel_INFO);
 
   if (enet_initialize() != 0) {
     ts3_log("Unable to initialize ENet", LogLevel_ERROR);
     return false;
   }
+
+  client = new Client();
   
   httpServer = new HttpServer();
   httpServer->open(8080);
@@ -51,13 +55,28 @@ bool AlternateVoice_Start() {
   return true;
 }
 
-void AlternateVoice_Stop() {
+void AlternateVoice_stop() {
   ts3_log("Shutting down", LogLevel_INFO);
 
   httpServer->close();
   delete httpServer;
 
+  delete client;
+
   enet_deinitialize();
 
   ts3_log("Shutdown", LogLevel_INFO);
+}
+
+bool AlternateVoice_connect(std::string host, uint16_t port, std::string uniqueIdentifier) {
+  if (client->connect(host, port, uniqueIdentifier) == false) {
+    ts3_log("Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
+    return false;
+  }
+
+  return true;
+}
+
+void AlternateVoice_disconnect() {
+  client->disconnect();
 }
