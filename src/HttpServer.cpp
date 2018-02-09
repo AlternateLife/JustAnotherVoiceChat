@@ -39,7 +39,9 @@ HttpServer::~HttpServer() {
 }
 
 bool HttpServer::open(uint16_t port) {
-  close();
+  if (_daemon != nullptr) {
+    return false;
+  }
 
   _daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port, NULL, NULL, &HttpServer::requestHandler, NULL, MHD_OPTION_END);
   if (_daemon == NULL) {
@@ -66,17 +68,16 @@ bool HttpServer::isOpen() const {
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
   std::cout << method << " " << url << std::endl;
 
-  const char *page = "<html><body>Hello World!</body></html>";
+  const char *page = "<html><body>OK</body></html>";
+  return sendResponse(connection, page);
+}
 
-  struct MHD_Response *response;
-  int ret;
+int HttpServer::sendResponse(struct MHD_Connection *connection, const char *page) {
+  auto response = MHD_create_response_from_buffer(strlen(page), (void *)page, MHD_RESPMEM_PERSISTENT);
+  int result = MHD_queue_response(connection, MHD_HTTP_OK, response);
 
-  response = MHD_create_response_from_buffer(strlen(page), (void *)page, MHD_RESPMEM_PERSISTENT);
-
-  ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
-
-  return ret;
+  return result;
 }
 
 int HttpServer::requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr) {

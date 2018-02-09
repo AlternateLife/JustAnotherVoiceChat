@@ -1,5 +1,5 @@
 /*
- * File: HttpServer.h
+ * File: Client.cpp
  * Date: 09.02.2018
  *
  * MIT License
@@ -25,26 +25,40 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include "Client.h"
 
-#include <string>
-#include <microhttpd.h>
+#define NETWORK_CHANNELS 2
 
-class HttpServer {
-private:
-  struct MHD_Daemon *_daemon;
+Client::Client() {
+  _client = nullptr;
+  _peer = nullptr;
+}
 
-public:
-  HttpServer();
-  virtual ~HttpServer();
+Client::~Client() {
+  close();
+}
 
-  bool open(uint16_t port);
-  void close();
-  bool isOpen() const;
+bool Client::open(std::string host, uint16_t port) {
+  if (_client != nullptr) {
+    return false;
+  }
 
-private:
-  int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
-  int sendResponse(struct MHD_Connection *connection, const char *content);
+  _client = enet_host_create(NULL, 1, NETWORK_CHANNELS, 0, 0);
+  if (_client == NULL) {
+    _client = nullptr;
+    return false;
+  }
 
-  static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
-};
+  return true;
+}
+
+void Client::close() {
+  if (_client != nullptr) {
+    enet_host_destroy(_client);
+    _client = nullptr;
+  }
+}
+
+bool Client::isOpen() const {
+  return _client != nullptr;
+}

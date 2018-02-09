@@ -1,5 +1,5 @@
 /*
- * File: HttpServer.h
+ * File: Client.h
  * Date: 09.02.2018
  *
  * MIT License
@@ -27,24 +27,23 @@
 
 #pragma once
 
-#include <string>
-#include <microhttpd.h>
+#include <enet/enet.h>
 
-class HttpServer {
+#include <string>
+
+class Client {
 private:
-  struct MHD_Daemon *_daemon;
+  ENetHost *_client;
+  ENetPeer *_peer;
 
 public:
-  HttpServer();
-  virtual ~HttpServer();
+  Client();
+  virtual ~Client();
 
-  bool open(uint16_t port);
+  bool open(std::string host, uint16_t port);
   void close();
   bool isOpen() const;
 
 private:
-  int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
-  int sendResponse(struct MHD_Connection *connection, const char *content);
 
-  static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
 };
