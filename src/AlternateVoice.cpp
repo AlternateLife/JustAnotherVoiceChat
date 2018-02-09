@@ -31,28 +31,33 @@
 #include <enet/enet.h>
 
 #include "HttpServer.h"
+#include "Teamspeak.h"
 
 HttpServer *httpServer = nullptr;
 
 bool AlternateVoice_Start() {
-  std::cout << "AlternateVoice: init" << std::endl;
+  ts3_log("Initialize", LogLevel_INFO);
 
   if (enet_initialize() != 0) {
-    std::cout << "AlternateVoice: Unable to initialize ENet" << std::endl;
+    ts3_log("Unable to initialize ENet", LogLevel_ERROR);
     return false;
   }
   
   httpServer = new HttpServer();
   httpServer->open(8080);
 
+  ts3_connect("ts.alternate-life.de", 9987, "");
+
   return true;
 }
 
 void AlternateVoice_Stop() {
-  std::cout << "AlternateVoice: shutdown" << std::endl;
+  ts3_log("Shutting down", LogLevel_INFO);
 
   httpServer->close();
   delete httpServer;
 
   enet_deinitialize();
+
+  ts3_log("Shutdown", LogLevel_INFO);
 }

@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <plugin_definitions.h>
+#include <teamspeak/public_errors.h>
 
 #include "Version.h"
 #include "AlternateVoice.h"
@@ -40,7 +40,74 @@
 
 static struct TS3Functions ts3Functions;
 static char versionBuffer[16];
+static uint64 serverConnectionHandler = 0;
 
+void ts3_log(std::string message, enum LogLevel severity) {
+  ts3Functions.logMessage(message.c_str(), severity, "AlternateVoice", 0);
+}
+
+anyID ts3_clientID() {
+  // check if connected to the server
+  if (serverConnectionHandler == 0) {
+    ts3_log("Unable to get client ID when not connected to a server", LogLevel_WARNING);
+    return 0;
+  }
+
+  int status;
+  int result = ts3Functions.getConnectionStatus(serverConnectionHandler, &status);
+  if (result != ERROR_ok) {
+    ts3_log("Unable to get server connection status", LogLevel_WARNING);
+    return 0;
+  }
+
+  // 1 = connected, 0 = not connected
+  if (status != 1) {
+    return 0;
+  }
+
+  // get client ID on this server
+  anyID clientID;
+  result = ts3Functions.getClientID(serverConnectionHandler, &clientID);
+  if (result != ERROR_ok) {
+    ts3_log("Unable to get client ID", LogLevel_ERROR);
+    return 0;
+  }
+
+  return clientID;
+}
+
+bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
+  // create connection handler if needed
+  int result;
+
+  if (serverConnectionHandler == 0) {
+    result = ts3Functions.spawnNewServerConnectionHandler(0, &serverConnectionHandler);
+    if (result != ERROR_ok) {
+      ts3_log("Unable to spawn server connection handler", LogLevel_ERROR);
+      return false;
+    }
+  }
+
+  char *identity;
+  result = ts3Functions.createIdentity(&identity);
+  if (result != ERROR_ok) {
+    ts3_log("Unable to create a teamspeak identity", LogLevel_ERROR);
+    return false;
+  }
+
+  result = ts3Functions.startConnection(serverConnectionHandler, identity, host.c_str(), port, "Test", NULL, "", serverPassword.c_str());
+  if (result != ERROR_ok) {
+    ts3_log(std::to_string(result) + ": Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
+    return false;
+  }
+
+  ts3Functions.freeMemory(identity);
+  return true;
+}
+
+void ts3_disconnect() {
+
+}
 
 const char *ts3plugin_name() {
   return "AlternateVoice";
@@ -69,12 +136,30 @@ void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
 
 int ts3plugin_init() {
   if (AlternateVoice_Start() == false) {
-    return 0;
+    return 1;
   }
 
   return 0;
 }
 
 void ts3plugin_shutdown() {
+  if (serverConnectionHandler != 0) {
+    ts3Functions.destroyServerConnectionHandler(serverConnectionHandler);
+  }
+
   AlternateVoice_Stop();
+}
+
+void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
+  char name[512];
+  if (ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512) != ERROR_ok) {
+    ts3_log("Unable to get client's display name", LogLevel_WARNING);
+    return;
+  }
+
+  if (status == STATUS_TALKING) {
+    ts3_log(std::string(name) + " starts talking", LogLevel_INFO);
+  } else {
+    ts3_log(std::string(name) + " stops talking", LogLevel_INFO);
+  }
 }

@@ -27,10 +27,12 @@
 
 #pragma once
 
+#include <string>
 #include <stdint.h>
 #include <stdio.h>
 
-#include "ts3_functions.h"
+#include <ts3_functions.h>
+#include <plugin_definitions.h>
 
 #ifdef _WIN32
 #ifdef ALTERNATEVOICE_EXPORTS
@@ -45,6 +47,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// wrapped functions
+void ts3_log(std::string message, enum LogLevel severity);
+
+bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
+void ts3_disconnect();
+anyID ts3_clientID();
+void ts3_setClientVolumeModifier(anyID clientID, float value);
+void ts3_setClientPosition(anyID clientID, const TS3_Vector *position);
 
 // Required functions
 ALTERNATEVOICE_API const char* ts3plugin_name();
@@ -69,6 +80,47 @@ ALTERNATEVOICE_API void ts3plugin_freeMemory(void* data);
 ALTERNATEVOICE_API int ts3plugin_requestAutoload();
 ALTERNATEVOICE_API void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon);
 ALTERNATEVOICE_API void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys);
+
+// Clientlib
+ALTERNATEVOICE_API void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
+ALTERNATEVOICE_API void ts3plugin_onNewChannelEvent(uint64 serverConnectionHandlerID, uint64 channelID, uint64 channelParentID);
+ALTERNATEVOICE_API void ts3plugin_onNewChannelCreatedEvent(uint64 serverConnectionHandlerID, uint64 channelID, uint64 channelParentID, anyID invokerID, const char* invokerName, const char* invokerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onDelChannelEvent(uint64 serverConnectionHandlerID, uint64 channelID, anyID invokerID, const char* invokerName, const char* invokerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onChannelMoveEvent(uint64 serverConnectionHandlerID, uint64 channelID, uint64 newChannelParentID, anyID invokerID, const char* invokerName, const char* invokerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onUpdateChannelEvent(uint64 serverConnectionHandlerID, uint64 channelID);
+ALTERNATEVOICE_API void ts3plugin_onUpdateChannelEditedEvent(uint64 serverConnectionHandlerID, uint64 channelID, anyID invokerID, const char* invokerName, const char* invokerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onUpdateClientEvent(uint64 serverConnectionHandlerID, anyID clientID, anyID invokerID, const char* invokerName, const char* invokerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage);
+ALTERNATEVOICE_API void ts3plugin_onClientMoveSubscriptionEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility);
+ALTERNATEVOICE_API void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage);
+ALTERNATEVOICE_API void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage);
+ALTERNATEVOICE_API void ts3plugin_onClientKickFromChannelEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID kickerID, const char* kickerName, const char* kickerUniqueIdentifier, const char* kickMessage);
+ALTERNATEVOICE_API void ts3plugin_onClientKickFromServerEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID kickerID, const char* kickerName, const char* kickerUniqueIdentifier, const char* kickMessage);
+ALTERNATEVOICE_API void ts3plugin_onClientIDsEvent(uint64 serverConnectionHandlerID, const char* uniqueClientIdentifier, anyID clientID, const char* clientName);
+ALTERNATEVOICE_API void ts3plugin_onClientIDsFinishedEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API void ts3plugin_onServerEditedEvent(uint64 serverConnectionHandlerID, anyID editerID, const char* editerName, const char* editerUniqueIdentifier);
+ALTERNATEVOICE_API void ts3plugin_onServerUpdatedEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API int  ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage);
+ALTERNATEVOICE_API void ts3plugin_onServerStopEvent(uint64 serverConnectionHandlerID, const char* shutdownMessage);
+ALTERNATEVOICE_API int  ts3plugin_onTextMessageEvent(uint64 serverConnectionHandlerID, anyID targetMode, anyID toID, anyID fromID, const char* fromName, const char* fromUniqueIdentifier, const char* message, int ffIgnored);
+ALTERNATEVOICE_API void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID);
+ALTERNATEVOICE_API void ts3plugin_onConnectionInfoEvent(uint64 serverConnectionHandlerID, anyID clientID);
+ALTERNATEVOICE_API void ts3plugin_onServerConnectionInfoEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API void ts3plugin_onChannelSubscribeEvent(uint64 serverConnectionHandlerID, uint64 channelID);
+ALTERNATEVOICE_API void ts3plugin_onChannelSubscribeFinishedEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API void ts3plugin_onChannelUnsubscribeEvent(uint64 serverConnectionHandlerID, uint64 channelID);
+ALTERNATEVOICE_API void ts3plugin_onChannelUnsubscribeFinishedEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API void ts3plugin_onChannelDescriptionUpdateEvent(uint64 serverConnectionHandlerID, uint64 channelID);
+ALTERNATEVOICE_API void ts3plugin_onChannelPasswordChangedEvent(uint64 serverConnectionHandlerID, uint64 channelID);
+ALTERNATEVOICE_API void ts3plugin_onPlaybackShutdownCompleteEvent(uint64 serverConnectionHandlerID);
+ALTERNATEVOICE_API void ts3plugin_onSoundDeviceListChangedEvent(const char* modeID, int playOrCap);
+ALTERNATEVOICE_API void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
+ALTERNATEVOICE_API void ts3plugin_onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
+ALTERNATEVOICE_API void ts3plugin_onEditMixedPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
+ALTERNATEVOICE_API void ts3plugin_onEditCapturedVoiceDataEvent(uint64 serverConnectionHandlerID, short* samples, int sampleCount, int channels, int* edited);
+ALTERNATEVOICE_API void ts3plugin_onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume);
+ALTERNATEVOICE_API void ts3plugin_onCustom3dRolloffCalculationWaveEvent(uint64 serverConnectionHandlerID, uint64 waveHandle, float distance, float* volume);
+ALTERNATEVOICE_API void ts3plugin_onUserLoggingMessageEvent(const char* logMessage, int logLevel, const char* logChannel, uint64 logID, const char* logTime, const char* completeLogString);
 
 // Clientlib rare
 ALTERNATEVOICE_API void ts3plugin_onClientBanFromServerEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID kickerID, const char* kickerName, const char* kickerUniqueIdentifier, uint64 time, const char* kickMessage);
