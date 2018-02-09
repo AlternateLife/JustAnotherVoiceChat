@@ -30,6 +30,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "Teamspeak.h"
+
 HttpServer::HttpServer() {
   _daemon = nullptr;
 }
@@ -66,8 +68,25 @@ bool HttpServer::isOpen() const {
 }
 
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
-  std::cout << method << " " << url << std::endl;
+  ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
 
+  // handle query parameters
+  const char *host = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "host");
+  if (host != NULL) {
+    ts3_log(std::string("\tHost: ") + host, LogLevel_DEBUG);
+  }
+
+  const char *port = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "port");
+  if (port != NULL) {
+    ts3_log(std::string("\tPort: ") + port, LogLevel_DEBUG);
+  }
+
+  const char *uniqueIdentifier = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "uid");
+  if (uniqueIdentifier != NULL) {
+    ts3_log(std::string("\tUID: ") + uniqueIdentifier, LogLevel_DEBUG);
+  }
+
+  // send response
   const char *page = "<html><body>OK</body></html>";
   return sendResponse(connection, page);
 }

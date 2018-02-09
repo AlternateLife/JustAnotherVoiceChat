@@ -33,6 +33,7 @@
 
 #include <ts3_functions.h>
 #include <plugin_definitions.h>
+#include <teamspeak/public_definitions.h>
 
 #ifdef _WIN32
 #ifdef ALTERNATEVOICE_EXPORTS
@@ -55,7 +56,7 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
 void ts3_disconnect();
 anyID ts3_clientID();
 void ts3_setClientVolumeModifier(anyID clientID, float value);
-void ts3_setClientPosition(anyID clientID, const TS3_Vector *position);
+void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
 
 // Required functions
 ALTERNATEVOICE_API const char* ts3plugin_name();

@@ -88,20 +88,20 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
     }
   }
 
-  char *identity;
-  result = ts3Functions.createIdentity(&identity);
-  if (result != ERROR_ok) {
-    ts3_log("Unable to create a teamspeak identity", LogLevel_ERROR);
-    return false;
-  }
+  // char *identity;
+  // result = ts3Functions.createIdentity(&identity);
+  // if (result != ERROR_ok) {
+  //   ts3_log("Unable to create a teamspeak identity", LogLevel_ERROR);
+  //   return false;
+  // }
 
-  result = ts3Functions.startConnection(serverConnectionHandler, identity, host.c_str(), port, "Test", NULL, "", serverPassword.c_str());
-  if (result != ERROR_ok) {
-    ts3_log(std::to_string(result) + ": Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
-    return false;
-  }
+  // result = ts3Functions.startConnection(serverConnectionHandler, identity, host.c_str(), port, "Test", NULL, "", serverPassword.c_str());
+  // if (result != ERROR_ok) {
+  //   ts3_log(std::to_string(result) + ": Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
+  //   return false;
+  // }
 
-  ts3Functions.freeMemory(identity);
+  // ts3Functions.freeMemory(identity);
   return true;
 }
 
