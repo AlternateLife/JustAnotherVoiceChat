@@ -31,12 +31,12 @@
 
 int main() {
   auto httpServer = new HttpServer();
-  if (httpServer->open(8080) == false) {
-    std::cout << "Unable to open http server on 8080" << std::endl;
+  if (httpServer->open(23333) == false) {
+    std::cout << "Unable to open http server on 23333" << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::cout << "Http server started on port 8080" << std::endl;
+  std::cout << "Http server started on port 23333" << std::endl;
 
   while (httpServer->isOpen());
 

@@ -48,7 +48,7 @@ bool AlternateVoice_start() {
   client = new Client();
   
   httpServer = new HttpServer();
-  httpServer->open(8080);
+  httpServer->open(23333);
 
   ts3_connect("ts.alternate-life.de", 9987, "");
 
