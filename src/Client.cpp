@@ -28,6 +28,7 @@
 #include "Client.h"
 
 #include "Teamspeak.h"
+#include "Protocol.h"
 
 #define NETWORK_CHANNELS 2
 

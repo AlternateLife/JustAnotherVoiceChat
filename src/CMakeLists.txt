@@ -13,6 +13,7 @@ include_directories(../include)
 include_directories(../thirdparty/ts3/include)
 include_directories(../thirdparty/enet/include)
 include_directories(../thirdparty/libmicrohttpd/src/include)
+include_directories(../thirdparty/cereal/include)
 include_directories("${AlternateVoice_BINARY_DIR}")
 
 if(WIN32)
