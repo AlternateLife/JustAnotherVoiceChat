@@ -92,7 +92,7 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
     return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
   }
 
-  AlternateVoice_connect(std::string(host), std::stoi(port), std::string(uniqueIdentifier));
+  AlternateVoice_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier));
 
   // send response
   const char *page = "<html><body>OK</body></html>";

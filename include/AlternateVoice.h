@@ -33,6 +33,6 @@ bool AlternateVoice_start();
 
 void AlternateVoice_stop();
 
-bool AlternateVoice_connect(std::string host, uint16_t port, std::string uniqueIdentifier);
+bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
 
 void AlternateVoice_disconnect();

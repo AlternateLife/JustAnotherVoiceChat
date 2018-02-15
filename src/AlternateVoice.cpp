@@ -68,7 +68,7 @@ void AlternateVoice_stop() {
   ts3_log("Shutdown", LogLevel_INFO);
 }
 
-bool AlternateVoice_connect(std::string host, uint16_t port, std::string uniqueIdentifier) {
+bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
   if (client->connect(host, port, uniqueIdentifier) == false) {
     ts3_log("Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
     return false;

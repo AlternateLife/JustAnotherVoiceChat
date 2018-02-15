@@ -37,14 +37,14 @@ Client::Client() {
   _peer = nullptr;
   _thread = nullptr;
   _stopping = false;
-  _uniqueIdentifier = "";
+  _uniqueIdentifier = 0;
 }
 
 Client::~Client() {
   close();
 }
 
-bool Client::connect(std::string host, uint16_t port, std::string uniqueIdentifier) {
+bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
   if (isOpen()) {
     return false;
   }
@@ -125,7 +125,9 @@ void Client::update() {
             break;
           }
 
+          handleMessage(event);
 
+          enet_packet_destroy(event.packet);
           break;
 
         default:
@@ -136,6 +138,49 @@ void Client::update() {
   }
 }
 
+void Client::handleMessage(ENetEvent &event) {
+  switch (event.channelID) {
+    case NETWORK_HANDSHAKE_CHANNEL:
+
+      break;
+
+    case NETWORK_UPDATE_CHANNEL:
+
+      break;
+
+    default:
+
+      break;
+  }
+}
+
 void Client::sendHandshake() {
-  
+  handshakePacket_t packet;
+  packet.gameId = _uniqueIdentifier;
+  packet.teamspeakId = ts3_clientID();
+
+  // serialize payload
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  auto data = os.str();
+  sendPacket((void *)data.c_str(), data.size(), NETWORK_HANDSHAKE_CHANNEL);
+}
+
+void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {
+  enet_uint32 flags = 0;
+
+  if (reliable) {
+    flags |= ENET_PACKET_FLAG_RELIABLE;
+  }
+
+  auto packet = enet_packet_create(data, length, flags);
+  enet_peer_send(_peer, channelId, packet);
 }

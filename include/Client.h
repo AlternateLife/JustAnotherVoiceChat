@@ -39,13 +39,13 @@ private:
 
   std::thread *_thread;
   bool _stopping;
-  std::string _uniqueIdentifier;
+  uint16_t _uniqueIdentifier;
 
 public:
   Client();
   virtual ~Client();
 
-  bool connect(std::string host, uint16_t port, std::string uniqueIdentifier);
+  bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
   void disconnect();
   bool isOpen() const;
 
@@ -53,5 +53,8 @@ private:
   void close();
   void update();
 
+  void handleMessage(ENetEvent &event);
+
   void sendHandshake();
+  void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
 };

@@ -27,19 +27,33 @@
 
 #include <iostream>
 
-#include "HttpServer.h"
+#include "Teamspeak.h"
 
-int main() {
-  auto httpServer = new HttpServer();
-  if (httpServer->open(23333) == false) {
-    std::cout << "Unable to open http server on 23333" << std::endl;
-    return EXIT_FAILURE;
-  }
+unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64 logId) {
+  std::cout << channel << "[" << severity << "]: " << message << std::endl;
+  return 0;
+}
 
-  std::cout << "Http server started on port 23333" << std::endl;
+unsigned int spawnNewServerConnectionHandler(int port, uint64 *result) {
+  *result = 0x1234;
+  return 0;
+}
 
-  while (httpServer->isOpen());
+unsigned int destroyServerConnectionHandler(uint64 handler) {
+  return 0;
+}
 
-  httpServer->close();
-  delete httpServer;
+int main(int argc, char **argv) {
+  // register functions
+  struct TS3Functions functions;
+  functions.logMessage = logMessage;
+  functions.spawnNewServerConnectionHandler = spawnNewServerConnectionHandler;
+  functions.destroyServerConnectionHandler = destroyServerConnectionHandler;
+  ts3plugin_setFunctionPointers(functions);
+
+  // mockup teamspeak 
+  ts3plugin_init();
+
+  // shutdown
+  ts3plugin_shutdown();
 }
