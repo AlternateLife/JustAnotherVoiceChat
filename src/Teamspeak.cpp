@@ -27,19 +27,8 @@
 
 #include "Teamspeak.h"
 
-#include <iostream>
-#include <stdio.h>
-#include <string.h>
+#include "TeamspeakPlugin.h"
 
-#include <teamspeak/public_errors.h>
-
-#include "Version.h"
-#include "AlternateVoice.h"
-
-#define PLUGIN_API_VERSION 22;
-
-static struct TS3Functions ts3Functions;
-static char versionBuffer[16];
 static uint64 serverConnectionHandler = 0;
 
 void ts3_log(std::string message, enum LogLevel severity) {
@@ -106,60 +95,7 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
 }
 
 void ts3_disconnect() {
-
-}
-
-const char *ts3plugin_name() {
-  return "AlternateVoice";
-}
-
-const char *ts3plugin_version() {
-  sprintf(versionBuffer, "%d.%d.%d.%d", ALTERNATEVOICE_VERSION_MAJOR, ALTERNATEVOICE_VERSION_MINOR, ALTERNATEVOICE_VERSION_PATCH, ALTERNATEVOICE_VERSION_BUILD);
-  return versionBuffer;
-}
-
-int ts3plugin_apiVersion() {
-  return PLUGIN_API_VERSION;
-}
-
-const char *ts3plugin_author() {
-  return "AlternateVoice";
-}
-
-const char *ts3plugin_description() {
-  return "3D game voice plugin for communicating with the AlternateVoice server";
-}
-
-void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
-  ts3Functions = funcs;
-}
-
-int ts3plugin_init() {
-  if (AlternateVoice_start() == false) {
-    return 1;
-  }
-
-  return 0;
-}
-
-void ts3plugin_shutdown() {
   if (serverConnectionHandler != 0) {
     ts3Functions.destroyServerConnectionHandler(serverConnectionHandler);
-  }
-
-  AlternateVoice_stop();
-}
-
-void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
-  char name[512];
-  if (ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512) != ERROR_ok) {
-    ts3_log("Unable to get client's display name", LogLevel_WARNING);
-    return;
-  }
-
-  if (status == STATUS_TALKING) {
-    ts3_log(std::string(name) + " starts talking", LogLevel_INFO);
-  } else {
-    ts3_log(std::string(name) + " stops talking", LogLevel_INFO);
   }
 }
