@@ -2,7 +2,7 @@
 file(GLOB SOURCES "./*.cpp")
 
 # Add executable
-add_executable(AlternateVoiceTest ${SOURCES})
+add_executable(AlternateVoiceTS3Mock ${SOURCES})
 
 # link external libraries
-target_link_libraries(AlternateVoiceTest AlternateVoice)
+target_link_libraries(AlternateVoiceTS3Mock AlternateVoice)
