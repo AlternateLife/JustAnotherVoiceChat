@@ -148,7 +148,7 @@ void Client::handleMessage(ENetEvent &event) {
       break;
 
     case NETWORK_UPDATE_CHANNEL:
-
+      handleUpdateResponse(event.packet);
       break;
 
     default:
@@ -178,6 +178,24 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
   }
 
   ts3_log("Handshake successful", LogLevel_INFO);
+}
+
+void Client::handleUpdateResponse(ENetPacket *packet) {
+  // deserialize payload
+  updatePacket_t updatePacket;
+
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is;
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(updatePacket);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  ts3_log("Update received: " + data, LogLevel_INFO);
 }
 
 void Client::sendResponse(int statusCode, std::string reason, int channelId) {
