@@ -26,8 +26,17 @@
  */
 
 #include <iostream>
+#include <thread>
+
+#ifdef _WIN32
+
+#else
+#include <csignal>
+#endif
 
 #include "teamspeakPlugin.h"
+
+static bool running = true;
 
 unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64 logId) {
   std::cout << channel << "[" << severity << "]: " << message << std::endl;
@@ -43,7 +52,22 @@ unsigned int destroyServerConnectionHandler(uint64 handler) {
   return 0;
 }
 
+#ifdef _WIN32
+
+#else
+void signalHandler(int signum) {
+  running = false;
+}
+#endif
+
 int main(int argc, char **argv) {
+#ifdef _WIN32
+
+#else
+  signal(SIGTERM, signalHandler);
+  signal(SIGINT, signalHandler);
+#endif
+
   // register functions
   struct TS3Functions functions;
   functions.logMessage = logMessage;
@@ -54,6 +78,10 @@ int main(int argc, char **argv) {
   // mockup teamspeak 
   ts3plugin_init();
 
-  // shutdown
+  while (running) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  // cleanup
   ts3plugin_shutdown();
 }
