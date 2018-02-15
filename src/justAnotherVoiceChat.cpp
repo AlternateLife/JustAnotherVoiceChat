@@ -1,10 +1,10 @@
 /*
- * File: src/alternateVoice.cpp
+ * File: src/justAnotherVoiceChat.cpp
  * Date: 08.02.2018
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-#include "alternateVoice.h"
+#include "justAnotherVoiceChat.h"
 
 #include <iostream>
 #include <enet/enet.h>
@@ -38,7 +38,7 @@
 HttpServer *httpServer = nullptr;
 Client *client = nullptr;
 
-bool AlternateVoice_start() {
+bool JustAnotherVoiceChat_start() {
   ts3_log("Initialize", LogLevel_INFO);
 
   if (enet_initialize() != 0) {
@@ -51,12 +51,12 @@ bool AlternateVoice_start() {
   httpServer = new HttpServer();
   httpServer->open(HTTP_PORT);
 
-  ts3_connect("ts.alternate-life.de", 9987, "");
+  ts3_connect("localhost", 9987, "");
 
   return true;
 }
 
-void AlternateVoice_stop() {
+void JustAnotherVoiceChat_stop() {
   ts3_log("Shutting down", LogLevel_INFO);
 
   httpServer->close();
@@ -69,7 +69,7 @@ void AlternateVoice_stop() {
   ts3_log("Shutdown", LogLevel_INFO);
 }
 
-bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
+bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
   if (client->connect(host, port, uniqueIdentifier) == false) {
     ts3_log("Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
     return false;
@@ -78,6 +78,6 @@ bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIden
   return true;
 }
 
-void AlternateVoice_disconnect() {
+void JustAnotherVoiceChat_disconnect() {
   client->disconnect();
 }

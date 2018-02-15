@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 #include <string>
 
 #include "teamspeak.h"
-#include "alternateVoice.h"
+#include "justAnotherVoiceChat.h"
 
 HttpServer::HttpServer() {
   _daemon = nullptr;
@@ -94,7 +94,7 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
   }
 
   ts3_log(std::string("Connect: ") + host + ":" + port, LogLevel_INFO);
-  AlternateVoice_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier));
+  JustAnotherVoiceChat_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier));
 
   // send response
   const char *page = "<html><body>OK</body></html>";

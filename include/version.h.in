@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 
 #pragma once
 
-#define ALTERNATEVOICE_VERSION_MAJOR @AlternateVoice_VERSION_MAJOR@
-#define ALTERNATEVOICE_VERSION_MINOR @AlternateVoice_VERSION_MINOR@
-#define ALTERNATEVOICE_VERSION_PATCH @AlternateVoice_VERSION_PATCH@
-#define ALTERNATEVOICE_VERSION_BUILD @AlternateVoice_VERSION_TWEAK@
+#define JUSTANOTHERVOICECHAT_VERSION_MAJOR @JustAnotherVoiceChat_VERSION_MAJOR@
+#define JUSTANOTHERVOICECHAT_VERSION_MINOR @JustAnotherVoiceChat_VERSION_MINOR@
+#define JUSTANOTHERVOICECHAT_VERSION_PATCH @JustAnotherVoiceChat_VERSION_PATCH@
+#define JUSTANOTHERVOICECHAT_VERSION_BUILD @JustAnotherVoiceChat_VERSION_TWEAK@

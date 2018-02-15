@@ -1,6 +1,6 @@
 # Setup base project
 cmake_minimum_required(VERSION 3.5)
-project(AlternateVoice VERSION 0.1.0.0 LANGUAGES CXX)
+project(JustAnotherVoiceChat VERSION 0.1.0.0 LANGUAGES CXX)
 
 # Setup basic C++ and project attributes
 set(CMAKE_CXX_STANDARD 11)
@@ -13,12 +13,12 @@ include_directories(thirdparty/ts3/include)
 include_directories(thirdparty/enet/include)
 include_directories(thirdparty/libmicrohttpd/src/include)
 include_directories(thirdparty/cereal/include)
-include_directories("${AlternateVoice_BINARY_DIR}")
+include_directories("${JustAnotherVoiceChat_BINARY_DIR}")
 
 if(WIN32)
-  link_directories(${AlternateVoice_SOURCE_DIR}/../thirdparty/libmicrohttpd)
+  link_directories(${JustAnotherVoiceChat_SOURCE_DIR}/../thirdparty/libmicrohttpd)
 else()
-  link_directories(${AlternateVoice_BINARY_DIR}/lib)
+  link_directories(${JustAnotherVoiceChat_BINARY_DIR}/lib)
 endif()
 
 # Add targets

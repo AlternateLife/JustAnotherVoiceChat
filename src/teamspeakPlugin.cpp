@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 #include <string.h>
 
 #include "version.h"
-#include "alternateVoice.h"
+#include "justAnotherVoiceChat.h"
 #include "teamspeak.h"
 
 #define PLUGIN_API_VERSION 22;
@@ -41,11 +41,11 @@ struct TS3Functions ts3Functions;
 static char versionBuffer[16];
 
 const char *ts3plugin_name() {
-  return "AlternateVoice";
+  return "JustAnotherVoiceChat";
 }
 
 const char *ts3plugin_version() {
-  sprintf(versionBuffer, "%d.%d.%d.%d", ALTERNATEVOICE_VERSION_MAJOR, ALTERNATEVOICE_VERSION_MINOR, ALTERNATEVOICE_VERSION_PATCH, ALTERNATEVOICE_VERSION_BUILD);
+  sprintf(versionBuffer, "%d.%d.%d.%d", JUSTANOTHERVOICECHAT_VERSION_MAJOR, JUSTANOTHERVOICECHAT_VERSION_MINOR, JUSTANOTHERVOICECHAT_VERSION_PATCH, JUSTANOTHERVOICECHAT_VERSION_BUILD);
   return versionBuffer;
 }
 
@@ -54,11 +54,11 @@ int ts3plugin_apiVersion() {
 }
 
 const char *ts3plugin_author() {
-  return "AlternateVoice";
+  return "JustAnotherVoiceChat";
 }
 
 const char *ts3plugin_description() {
-  return "3D game voice plugin for communicating with the AlternateVoice server";
+  return "3D game voice plugin for communicating with the JustAnotherVoiceChat server";
 }
 
 void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
@@ -66,7 +66,7 @@ void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
 }
 
 int ts3plugin_init() {
-  if (AlternateVoice_start() == false) {
+  if (JustAnotherVoiceChat_start() == false) {
     return 1;
   }
 
@@ -74,7 +74,7 @@ int ts3plugin_init() {
 }
 
 void ts3plugin_shutdown() {
-  AlternateVoice_stop();
+  JustAnotherVoiceChat_stop();
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {

@@ -1,8 +1,8 @@
-# AlternateVoice
+# JustAnotherVoiceChat
 
 ## Description
 
-This is the teamspeak 3 plugin whichs conects to the AlternateVoice server to control 3D voice communication.
+This is the teamspeak 3 plugin whichs conects to the JustAnotherVoiceChat server to control 3D voice communication.
 
 ## Setup
 
@@ -27,4 +27,4 @@ Place the plugin files in the teamspeak 3 client plugin directory.
 
 ## Authors
 
-MarkAtk  
+* MarkAtk

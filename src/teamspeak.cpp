@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 static uint64 serverConnectionHandler = 0;
 
 void ts3_log(std::string message, enum LogLevel severity) {
-  ts3Functions.logMessage(message.c_str(), severity, "AlternateVoice", 0);
+  ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
 }
 
 anyID ts3_clientID() {

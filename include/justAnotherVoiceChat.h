@@ -1,10 +1,10 @@
 /*
- * File: include/alternateVoice.h
+ * File: include/justAnotherVoiceChat.h
  * Date: 08.02.2018
  *
  * MIT License
  *
- * Copyright (c) 2018 AlternateVoice
+ * Copyright (c) 2018 JustAnotherVoiceChat
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,10 @@
 
 #include <string>
 
-bool AlternateVoice_start();
+bool JustAnotherVoiceChat_start();
 
-void AlternateVoice_stop();
+void JustAnotherVoiceChat_stop();
 
-bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
+bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
 
-void AlternateVoice_disconnect();
+void JustAnotherVoiceChat_disconnect();
