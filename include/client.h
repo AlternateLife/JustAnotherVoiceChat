@@ -1,6 +1,6 @@
 /*
- * File: Teamspeak.h
- * Date: 08.02.2018
+ * File: include/client.h
+ * Date: 09.02.2018
  *
  * MIT License
  *
@@ -27,14 +27,34 @@
 
 #pragma once
 
+#include <enet/enet.h>
+
 #include <string>
-#include <teamspeak/public_definitions.h>
+#include <thread>
 
-// wrapped functions
-void ts3_log(std::string message, enum LogLevel severity);
+class Client {
+private:
+  ENetHost *_client;
+  ENetPeer *_peer;
 
-bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
-void ts3_disconnect();
-anyID ts3_clientID();
-void ts3_setClientVolumeModifier(anyID clientID, float value);
-void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
+  std::thread *_thread;
+  bool _stopping;
+  uint16_t _uniqueIdentifier;
+
+public:
+  Client();
+  virtual ~Client();
+
+  bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
+  void disconnect();
+  bool isOpen() const;
+
+private:
+  void close();
+  void update();
+
+  void handleMessage(ENetEvent &event);
+
+  void sendHandshake();
+  void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
+};

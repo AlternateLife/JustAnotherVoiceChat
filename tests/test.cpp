@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-#include "TeamspeakPlugin.h"
+#include "teamspeakPlugin.h"
 
 unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64 logId) {
   std::cout << channel << "[" << severity << "]: " << message << std::endl;

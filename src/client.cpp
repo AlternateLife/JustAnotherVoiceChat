@@ -1,5 +1,5 @@
 /*
- * File: Client.cpp
+ * File: src/client.cpp
  * Date: 09.02.2018
  *
  * MIT License
@@ -25,10 +25,10 @@
  * SOFTWARE.
  */
 
-#include "Client.h"
+#include "client.h"
 
-#include "Teamspeak.h"
-#include "Protocol.h"
+#include "teamspeak.h"
+#include "protocol.h"
 
 #define NETWORK_CHANNELS 2
 

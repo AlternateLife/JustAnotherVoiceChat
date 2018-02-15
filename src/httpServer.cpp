@@ -1,5 +1,5 @@
 /*
- * File: HttpServer.cpp
+ * File: src/httpServer.cpp
  * Date: 09.02.2018
  *
  * MIT License
@@ -25,13 +25,13 @@
  * SOFTWARE.
  */
 
-#include "HttpServer.h"
+#include "httpServer.h"
 
 #include <iostream>
 #include <string.h>
 
-#include "Teamspeak.h"
-#include "AlternateVoice.h"
+#include "teamspeak.h"
+#include "alternateVoice.h"
 
 HttpServer::HttpServer() {
   _daemon = nullptr;

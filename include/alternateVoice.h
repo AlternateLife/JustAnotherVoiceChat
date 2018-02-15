@@ -1,5 +1,5 @@
 /*
- * File: Version.h
+ * File: include/alternateVoice.h
  * Date: 08.02.2018
  *
  * MIT License
@@ -27,7 +27,12 @@
 
 #pragma once
 
-#define ALTERNATEVOICE_VERSION_MAJOR @AlternateVoice_VERSION_MAJOR@
-#define ALTERNATEVOICE_VERSION_MINOR @AlternateVoice_VERSION_MINOR@
-#define ALTERNATEVOICE_VERSION_PATCH @AlternateVoice_VERSION_PATCH@
-#define ALTERNATEVOICE_VERSION_BUILD @AlternateVoice_VERSION_TWEAK@
+#include <string>
+
+bool AlternateVoice_start();
+
+void AlternateVoice_stop();
+
+bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
+
+void AlternateVoice_disconnect();

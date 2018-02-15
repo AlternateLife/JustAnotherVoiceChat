@@ -1,6 +1,6 @@
 /*
- * File: HttpServer.h
- * Date: 09.02.2018
+ * File: include/teamspeak.h
+ * Date: 08.02.2018
  *
  * MIT License
  *
@@ -28,23 +28,13 @@
 #pragma once
 
 #include <string>
-#include <microhttpd.h>
+#include <teamspeak/public_definitions.h>
 
-class HttpServer {
-private:
-  struct MHD_Daemon *_daemon;
+// wrapped functions
+void ts3_log(std::string message, enum LogLevel severity);
 
-public:
-  HttpServer();
-  virtual ~HttpServer();
-
-  bool open(uint16_t port);
-  void close();
-  bool isOpen() const;
-
-private:
-  int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
-  int sendResponse(struct MHD_Connection *connection, const char *content, unsigned int statusCode = MHD_HTTP_OK);
-
-  static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
-};
+bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
+void ts3_disconnect();
+anyID ts3_clientID();
+void ts3_setClientVolumeModifier(anyID clientID, float value);
+void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);

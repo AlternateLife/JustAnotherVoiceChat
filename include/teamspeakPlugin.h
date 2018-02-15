@@ -1,5 +1,5 @@
 /*
- * File: TeamspeakPlugin.h
+ * File: include/teamspeakPlugin.h
  * Date: 15.02.2018
  *
  * MIT License

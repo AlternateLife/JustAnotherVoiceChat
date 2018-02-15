@@ -1,6 +1,6 @@
 /*
- * File: AlternateVoice.h
- * Date: 08.02.2018
+ * File: include/httpServer.h
+ * Date: 09.02.2018
  *
  * MIT License
  *
@@ -28,11 +28,23 @@
 #pragma once
 
 #include <string>
+#include <microhttpd.h>
 
-bool AlternateVoice_start();
+class HttpServer {
+private:
+  struct MHD_Daemon *_daemon;
 
-void AlternateVoice_stop();
+public:
+  HttpServer();
+  virtual ~HttpServer();
 
-bool AlternateVoice_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
+  bool open(uint16_t port);
+  void close();
+  bool isOpen() const;
 
-void AlternateVoice_disconnect();
+private:
+  int handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize);
+  int sendResponse(struct MHD_Connection *connection, const char *content, unsigned int statusCode = MHD_HTTP_OK);
+
+  static int requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr);
+};

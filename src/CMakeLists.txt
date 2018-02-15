@@ -23,7 +23,7 @@ else()
 endif()
 
 # configure header files
-configure_file(../include/Version.h.in ${AlternateVoice_BINARY_DIR}/Version.h @ONLY)
+configure_file(../include/version.h.in ${AlternateVoice_BINARY_DIR}/version.h @ONLY)
 
 file(GLOB SOURCES "./*.cpp")
 

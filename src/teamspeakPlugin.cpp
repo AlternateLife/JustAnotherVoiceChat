@@ -1,5 +1,5 @@
 /*
- * File: TeamspeakPlugin.cpp
+ * File: src/teamspeakPlugin.cpp
  * Date: 15.02.2018
  *
  * MIT License
@@ -25,15 +25,15 @@
  * SOFTWARE.
  */
 
-#include "TeamspeakPlugin.h"
+#include "teamspeakPlugin.h"
 
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
 
-#include "Version.h"
-#include "AlternateVoice.h"
-#include "Teamspeak.h"
+#include "version.h"
+#include "alternateVoice.h"
+#include "teamspeak.h"
 
 #define PLUGIN_API_VERSION 22;
 

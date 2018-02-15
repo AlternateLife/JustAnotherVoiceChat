@@ -1,5 +1,5 @@
 /*
- * File: Teamspeak.cpp
+ * File: src/teamspeak.cpp
  * Date: 08.02.2018
  *
  * MIT License
@@ -25,9 +25,9 @@
  * SOFTWARE.
  */
 
-#include "Teamspeak.h"
+#include "teamspeak.h"
 
-#include "TeamspeakPlugin.h"
+#include "teamspeakPlugin.h"
 
 static uint64 serverConnectionHandler = 0;
 

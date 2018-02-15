@@ -1,5 +1,5 @@
 /*
- * File: AlternateVoice.cpp
+ * File: src/alternateVoice.cpp
  * Date: 08.02.2018
  *
  * MIT License
@@ -25,14 +25,14 @@
  * SOFTWARE.
  */
 
-#include "AlternateVoice.h"
+#include "alternateVoice.h"
 
 #include <iostream>
 #include <enet/enet.h>
 
-#include "HttpServer.h"
-#include "Teamspeak.h"
-#include "Client.h"
+#include "httpServer.h"
+#include "teamspeak.h"
+#include "client.h"
 
 HttpServer *httpServer = nullptr;
 Client *client = nullptr;
