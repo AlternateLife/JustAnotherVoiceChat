@@ -54,7 +54,9 @@ private:
   void update();
 
   void handleMessage(ENetEvent &event);
+  void handleHandshapeResponse(ENetPacket *packet);
 
+  void sendResponse(int statusCode, std::string reason, int channelId);
   void sendHandshake();
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
 };

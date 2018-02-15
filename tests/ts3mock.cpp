@@ -39,7 +39,35 @@
 static bool running = true;
 
 unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64 logId) {
-  std::cout << channel << "[" << severity << "]: " << message << std::endl;
+  std::string logType = "";
+
+  switch(severity) {
+    case LogLevel_CRITICAL:
+      logType = "CRITICAL";
+      break;
+
+    case LogLevel_DEBUG:
+      logType = "   DEBUG";
+      break;
+
+    case LogLevel_DEVEL:
+      logType = "   DEVEL";
+      break;
+
+    case LogLevel_ERROR:
+      logType = "   ERROR";
+      break;
+
+    case LogLevel_INFO:
+      logType = "    INFO";
+      break;
+
+    case LogLevel_WARNING:
+      logType = " WARNING";
+      break;
+  }
+
+  std::cout << channel << " " << logType << " [" << severity << "]: " << message << std::endl;
   return 0;
 }
 
@@ -49,6 +77,16 @@ unsigned int spawnNewServerConnectionHandler(int port, uint64 *result) {
 }
 
 unsigned int destroyServerConnectionHandler(uint64 handler) {
+  return 0;
+}
+
+unsigned int getConnectionStatus(uint64 serverConnectionHandler, int *result) {
+  *result = 1;
+  return 0;
+}
+
+unsigned int getClientId(uint64 serverConnectionHandler, anyID *result) {
+  *result = 4;
   return 0;
 }
 
@@ -73,6 +111,8 @@ int main(int argc, char **argv) {
   functions.logMessage = logMessage;
   functions.spawnNewServerConnectionHandler = spawnNewServerConnectionHandler;
   functions.destroyServerConnectionHandler = destroyServerConnectionHandler;
+  functions.getConnectionStatus = getConnectionStatus;
+  functions.getClientID = getClientId;
   ts3plugin_setFunctionPointers(functions);
 
   // mockup teamspeak 

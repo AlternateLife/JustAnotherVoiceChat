@@ -30,8 +30,6 @@
 #include "teamspeak.h"
 #include "protocol.h"
 
-#define NETWORK_CHANNELS 2
-
 Client::Client() {
   _client = nullptr;
   _peer = nullptr;
@@ -70,8 +68,19 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
     return false;
   }
 
+  // check if connecting is successful
+  ENetEvent event;
+  if (enet_host_service(_client, &event, 5000) <= 0 || event.type != ENET_EVENT_TYPE_CONNECT) {
+    enet_peer_reset(_peer);
+    return false;
+  }
+
   _thread = new std::thread(&Client::update, this);
   _uniqueIdentifier = uniqueIdentifier;
+
+  ts3_log("Connection established", LogLevel_DEBUG);
+  sendHandshake();
+
   return true;
 }
 
@@ -107,12 +116,6 @@ void Client::update() {
   while(true) {
     if (enet_host_service(_client, &event, 1000) > 0) {
       switch (event.type) {
-        case ENET_EVENT_TYPE_CONNECT:
-          ts3_log("Connection established", LogLevel_DEBUG);
-
-          sendHandshake();
-          break;
-
         case ENET_EVENT_TYPE_DISCONNECT:
           ts3_log("Connection closed", LogLevel_DEBUG);
 
@@ -125,8 +128,8 @@ void Client::update() {
             break;
           }
 
+          // handle message and delete payload afterwards
           handleMessage(event);
-
           enet_packet_destroy(event.packet);
           break;
 
@@ -141,7 +144,7 @@ void Client::update() {
 void Client::handleMessage(ENetEvent &event) {
   switch (event.channelID) {
     case NETWORK_HANDSHAKE_CHANNEL:
-
+      handleHandshapeResponse(event.packet);
       break;
 
     case NETWORK_UPDATE_CHANNEL:
@@ -149,9 +152,52 @@ void Client::handleMessage(ENetEvent &event) {
       break;
 
     default:
-
+      ts3_log("Unknown message on channel " + std::to_string(event.channelID), LogLevel_INFO);
       break;
   }
+}
+
+void Client::handleHandshapeResponse(ENetPacket *packet) {
+  // deserialize payload
+  responsePacket_t responsePacket;
+
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is(data);
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(responsePacket);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  if (responsePacket.statusCode != STATUS_CODE_OK) {
+    ts3_log("Handshake failed: " + std::to_string(responsePacket.statusCode) + ": " + responsePacket.reason , LogLevel_WARNING);
+    return;
+  }
+
+  ts3_log("Handshake successful", LogLevel_INFO);
+}
+
+void Client::sendResponse(int statusCode, std::string reason, int channelId) {
+  responsePacket_t packet;
+  packet.statusCode = statusCode;
+  packet.reason = reason;
+  
+  // serialize payload
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  auto data = os.str();
+  sendPacket((void *)data.c_str(), data.size(), channelId);
 }
 
 void Client::sendHandshake() {

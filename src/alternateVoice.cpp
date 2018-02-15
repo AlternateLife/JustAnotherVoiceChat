@@ -30,6 +30,7 @@
 #include <iostream>
 #include <enet/enet.h>
 
+#include "protocol.h"
 #include "httpServer.h"
 #include "teamspeak.h"
 #include "client.h"
@@ -48,7 +49,7 @@ bool AlternateVoice_start() {
   client = new Client();
   
   httpServer = new HttpServer();
-  httpServer->open(23333);
+  httpServer->open(HTTP_PORT);
 
   ts3_connect("ts.alternate-life.de", 9987, "");
 

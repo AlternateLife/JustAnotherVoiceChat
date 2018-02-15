@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <string.h>
+#include <string>
 
 #include "teamspeak.h"
 #include "alternateVoice.h"
@@ -92,6 +93,7 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
     return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
   }
 
+  ts3_log(std::string("Connect: ") + host + ":" + port, LogLevel_INFO);
   AlternateVoice_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier));
 
   // send response
