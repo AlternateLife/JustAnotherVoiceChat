@@ -40,6 +40,8 @@ private:
   std::thread *_thread;
   bool _stopping;
   uint16_t _uniqueIdentifier;
+  std::string _host;
+  uint16_t _port;
 
 public:
   Client();
@@ -52,6 +54,7 @@ public:
 private:
   void close();
   void update();
+  void abortThread();
 
   void sendHandshake();
   void handleMessage(ENetEvent &event);

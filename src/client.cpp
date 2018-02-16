@@ -43,8 +43,12 @@ Client::~Client() {
 }
 
 bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
+  if (host == _host && _port == port && _uniqueIdentifier == uniqueIdentifier) {
+    return true;
+  }
+
   if (isOpen()) {
-    return false;
+    disconnect();
   }
 
   _client = enet_host_create(NULL, 1, NETWORK_CHANNELS, 0, 0);
@@ -77,6 +81,9 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
 
   _thread = new std::thread(&Client::update, this);
   _uniqueIdentifier = uniqueIdentifier;
+  _host = host;
+  _port = port;
+  _stopping = false;
 
   ts3_log("Connection established", LogLevel_DEBUG);
   sendHandshake();
@@ -86,7 +93,33 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
 
 void Client::disconnect() {
   enet_peer_disconnect(_peer, 0);
-  _stopping = true;
+
+  // stop main update thread
+  abortThread();
+
+  ENetEvent event;
+
+  while (enet_host_service(_client, &event, 3000) > 0) {
+    switch (event.type) {
+      case ENET_EVENT_TYPE_DISCONNECT:
+        ts3_log("Disconnected", LogLevel_INFO);
+        break;
+
+      default:
+        if (event.packet != 0) {
+          enet_packet_destroy(event.packet);
+        }
+        continue;
+    }
+
+    break;
+  }
+
+  _host = "";
+  _port = 0;
+  _uniqueIdentifier = 0;
+
+  close();
 }
 
 bool Client::isOpen() const {
@@ -94,10 +127,7 @@ bool Client::isOpen() const {
 }
 
 void Client::close() {
-  if (_thread != nullptr) {
-    delete _thread;
-    _thread = nullptr;
-  }
+  abortThread();
   
   if (_client != nullptr) {
     enet_host_destroy(_client);
@@ -108,13 +138,20 @@ void Client::close() {
     enet_peer_reset(_peer);
     _peer = nullptr;
   }
+
+  _stopping = true;
+  _host = "";
+  _port = 0;
+  _uniqueIdentifier = 0;
 }
 
 void Client::update() {
   ENetEvent event;
 
-  while(true) {
-    if (enet_host_service(_client, &event, 1000) > 0) {
+  while(_stopping == false) {
+    int code = enet_host_service(_client, &event, 100);
+
+    if (code > 0) {
       switch (event.type) {
         case ENET_EVENT_TYPE_DISCONNECT:
           ts3_log("Connection closed", LogLevel_DEBUG);
@@ -137,8 +174,25 @@ void Client::update() {
 
           break;
       }
+    } else if (code < 0) {
+      ts3_log("Error occured " + std::to_string(code), LogLevel_DEBUG);
+      _stopping = true;
     }
   }
+}
+
+void Client::abortThread() {
+  // stop thread
+  if (_stopping || _thread == nullptr) {
+    return;
+  }
+
+  _stopping = true;
+  _thread->join();
+
+  // delete object
+  delete _thread;
+  _thread = nullptr;
 }
 
 void Client::handleMessage(ENetEvent &event) {
