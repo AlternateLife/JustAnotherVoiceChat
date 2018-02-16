@@ -1,8 +1,6 @@
 # Setup library project
 add_definitions(-DJUSTANOTHERVOICECHAT_EXPORTS)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 # Search required libraries
 find_package(Threads)
 
