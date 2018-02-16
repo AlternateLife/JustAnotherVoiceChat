@@ -16,7 +16,7 @@ include_directories(thirdparty/cereal/include)
 include_directories("${JustAnotherVoiceChat_BINARY_DIR}")
 
 if(WIN32)
-  link_directories(${JustAnotherVoiceChat_SOURCE_DIR}/../thirdparty/libmicrohttpd)
+  link_directories(${JustAnotherVoiceChat_SOURCE_DIR}/thirdparty/libmicrohttpd)
 else()
   link_directories(${JustAnotherVoiceChat_BINARY_DIR}/lib)
 endif()
@@ -26,3 +26,4 @@ enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(thirdparty/enet)
