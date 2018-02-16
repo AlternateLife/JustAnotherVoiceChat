@@ -34,7 +34,7 @@ Client::Client() {
   _client = nullptr;
   _peer = nullptr;
   _thread = nullptr;
-  _stopping = false;
+  _running = false;
   _uniqueIdentifier = 0;
 }
 
@@ -64,56 +64,53 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
 
   _peer = enet_host_connect(_client, &address, NETWORK_CHANNELS, 0);
   if (_peer == NULL) {
-    enet_peer_reset(_peer);
-    enet_host_destroy(_client);
-
-    _client = nullptr;
-    _peer = nullptr;
+    close();
     return false;
   }
 
   // check if connecting is successful
   ENetEvent event;
   if (enet_host_service(_client, &event, 5000) <= 0 || event.type != ENET_EVENT_TYPE_CONNECT) {
-    enet_peer_reset(_peer);
+    close();
     return false;
   }
 
-  _thread = new std::thread(&Client::update, this);
   _uniqueIdentifier = uniqueIdentifier;
   _host = host;
   _port = port;
-  _stopping = false;
+  _running = true;
 
+  // start update thread
+  _thread = new std::thread(&Client::update, this);
   ts3_log("Connection established", LogLevel_DEBUG);
-  sendHandshake();
 
+  sendHandshake();
   return true;
 }
 
 void Client::disconnect() {
+  if (_peer == nullptr) {
+    return;
+  }
+
   enet_peer_disconnect(_peer, 0);
 
   // stop main update thread
   abortThread();
 
   ENetEvent event;
-
   while (enet_host_service(_client, &event, 3000) > 0) {
-    switch (event.type) {
-      case ENET_EVENT_TYPE_DISCONNECT:
-        ts3_log("Disconnected", LogLevel_INFO);
-        break;
-
-      default:
-        if (event.packet != 0) {
-          enet_packet_destroy(event.packet);
-        }
-        continue;
+    if (event.type == ENET_EVENT_TYPE_DISCONNECT) {
+      break;
     }
 
-    break;
+    // discard any other event
+    if (event.packet != 0) {
+      enet_packet_destroy(event.packet);
+    }
   }
+
+  ts3_log("Disconnected", LogLevel_INFO);
 
   _host = "";
   _port = 0;
@@ -123,23 +120,23 @@ void Client::disconnect() {
 }
 
 bool Client::isOpen() const {
-  return _client != nullptr && _peer != nullptr && _stopping == false;
+  return _client != nullptr && _peer != nullptr && _running;
 }
 
 void Client::close() {
   abortThread();
   
-  if (_client != nullptr) {
-    enet_host_destroy(_client);
-    _client = nullptr;
-  }
-
   if (_peer != nullptr) {
     enet_peer_reset(_peer);
     _peer = nullptr;
   }
 
-  _stopping = true;
+  if (_client != nullptr) {
+    enet_host_destroy(_client);
+    _client = nullptr;
+  }
+
+  _running = false;
   _host = "";
   _port = 0;
   _uniqueIdentifier = 0;
@@ -148,7 +145,7 @@ void Client::close() {
 void Client::update() {
   ENetEvent event;
 
-  while(_stopping == false) {
+  while(_running) {
     int code = enet_host_service(_client, &event, 100);
 
     if (code > 0) {
@@ -160,7 +157,7 @@ void Client::update() {
           break;
 
         case ENET_EVENT_TYPE_RECEIVE:
-          if (_stopping) {
+          if (_running == false) {
             enet_packet_destroy(event.packet);
             break;
           }
@@ -171,23 +168,22 @@ void Client::update() {
           break;
 
         default:
-
           break;
       }
     } else if (code < 0) {
-      ts3_log("Error occured " + std::to_string(code), LogLevel_DEBUG);
-      _stopping = true;
+      ts3_log("Network error occured " + std::to_string(code), LogLevel_DEBUG);
+      _running = false;
     }
   }
 }
 
 void Client::abortThread() {
   // stop thread
-  if (_stopping || _thread == nullptr) {
+  if (_running == false || _thread == nullptr) {
     return;
   }
 
-  _stopping = true;
+  _running = false;
   _thread->join();
 
   // delete object

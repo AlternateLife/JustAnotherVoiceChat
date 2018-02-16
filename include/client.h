@@ -38,7 +38,7 @@ private:
   ENetPeer *_peer;
 
   std::thread *_thread;
-  bool _stopping;
+  bool _running;
   uint16_t _uniqueIdentifier;
   std::string _host;
   uint16_t _port;
