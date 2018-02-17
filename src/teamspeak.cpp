@@ -69,6 +69,7 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
 
         // save handle
         serverConnectionHandler = handle;
+        break;
       }
     } else {
       ts3_log("Unable to get server connection status " + std::to_string(handle), LogLevel_ERROR);
@@ -107,7 +108,7 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
   // }
 
   // ts3Functions.freeMemory(identity);
-  return true;
+  return false;
 }
 
 void ts3_disconnect() {

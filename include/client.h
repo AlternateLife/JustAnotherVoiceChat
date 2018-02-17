@@ -32,6 +32,8 @@
 #include <string>
 #include <thread>
 
+#include "protocol.h"
+
 class Client {
 private:
   ENetHost *_client;
@@ -39,7 +41,8 @@ private:
 
   std::thread *_thread;
   bool _running;
-  uint16_t _uniqueIdentifier;
+  uint16_t _gameId;
+  uint16_t _teamspeakId;
   std::string _host;
   uint16_t _port;
 
@@ -67,12 +70,11 @@ private:
   void update();
   void abortThread();
 
-  void sendHandshake();
+  void sendHandshake(int statusCode = STATUS_CODE_OK);
   void sendStatus();
   void handleMessage(ENetEvent &event);
   void handleHandshapeResponse(ENetPacket *packet);
   void handleUpdateMessage(ENetPacket *packet);
 
-  void sendResponse(int statusCode, std::string reason, int channelId);
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
 };

@@ -42,6 +42,8 @@
 
 #define STATUS_CODE_OK 0
 #define STATUS_CODE_UNKNOWN_ERROR 1
+#define STATUS_CODE_NOT_CONNECTED_TO_SERVER 2
+#define STATUS_CODE_NOT_MOVED_TO_CHANNEL 3
 
 typedef struct {
   uint16_t clientId;
@@ -86,6 +88,7 @@ typedef struct {
 typedef struct {
   uint16_t gameId;
   uint16_t teamspeakId;
+  int statusCode;
 
   template <class Archive>
   void serialize(Archive &ar) {

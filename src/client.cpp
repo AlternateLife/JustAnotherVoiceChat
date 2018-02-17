@@ -35,7 +35,8 @@ Client::Client() {
   _peer = nullptr;
   _thread = nullptr;
   _running = false;
-  _uniqueIdentifier = 0;
+  _gameId = 0;
+  _teamspeakId = 0;
   _talking = false;
   _microphoneMuted = false;
   _speakersMuted = false;
@@ -46,7 +47,7 @@ Client::~Client() {
 }
 
 bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
-  if (host == _host && _port == port && _uniqueIdentifier == uniqueIdentifier) {
+  if (host == _host && _port == port && _gameId == uniqueIdentifier) {
     return true;
   }
 
@@ -80,9 +81,10 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
 
   abortThread();
 
-  _uniqueIdentifier = uniqueIdentifier;
+  _gameId = uniqueIdentifier;
   _host = host;
   _port = port;
+  _teamspeakId = 0;
   _running = true;
 
   // start update thread
@@ -119,7 +121,8 @@ void Client::disconnect() {
 
   _host = "";
   _port = 0;
-  _uniqueIdentifier = 0;
+  _gameId = 0;
+  _teamspeakId = 0;
 
   close();
 }
@@ -174,7 +177,8 @@ void Client::close() {
   _running = false;
   _host = "";
   _port = 0;
-  _uniqueIdentifier = 0;
+  _gameId = 0;
+  _teamspeakId = 0;
 }
 
 void Client::update() {
@@ -232,10 +236,11 @@ void Client::abortThread() {
   }
 }
 
-void Client::sendHandshake() {
+void Client::sendHandshake(int statusCode) {
   handshakePacket_t packet;
-  packet.gameId = _uniqueIdentifier;
-  packet.teamspeakId = ts3_clientID();
+  packet.gameId = _gameId;
+  packet.teamspeakId = _teamspeakId;
+  packet.statusCode = statusCode;
 
   // serialize payload
   std::ostringstream os;
@@ -315,15 +320,21 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
 
   if (ts3_connect(responsePacket.teamspeakEndpoint, responsePacket.teamspeakPort, responsePacket.teamspeakPassword) == false) {
     ts3_log(std::string("Unable to connect to teamspeak server:") + responsePacket.teamspeakEndpoint + ":" + std::to_string(responsePacket.teamspeakPort), LogLevel_WARNING);
+    sendHandshake(STATUS_CODE_NOT_CONNECTED_TO_SERVER);
     return;
   }
 
   auto serverHandle =  ts3_serverConnectionHandle();
   if (ts3_moveToChannel(serverHandle, responsePacket.channelId, responsePacket.channelPassword) == false) {
     ts3_log(std::string("Unable to move into channel ") + std::to_string(responsePacket.channelId), LogLevel_WARNING);
+    sendHandshake(STATUS_CODE_NOT_MOVED_TO_CHANNEL);
     return;
   }
 
+  // connection on teamspeak server is valid, save teamspeak id
+  _teamspeakId = ts3_clientID(serverHandle);
+
+  sendHandshake();
   ts3_log("Handshake successful", LogLevel_DEBUG);
 }
 
@@ -343,26 +354,6 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
   }
 
   ts3_log("Update received: " + data, LogLevel_DEBUG);
-}
-
-void Client::sendResponse(int statusCode, std::string reason, int channelId) {
-  /*responsePacket_t packet;
-  packet.statusCode = statusCode;
-  packet.reason = reason;
-  
-  // serialize payload
-  std::ostringstream os;
-
-  try {
-    cereal::BinaryOutputArchive archive(os);
-    archive(packet);
-  } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
-    return;
-  }
-
-  auto data = os.str();
-  sendPacket((void *)data.c_str(), data.size(), channelId);*/
 }
 
 void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {
