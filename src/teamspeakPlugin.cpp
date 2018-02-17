@@ -78,7 +78,9 @@ void ts3plugin_shutdown() {
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
-  if (clientID != ts3_clientID()) {
+  // TODO: Only check on valid servers
+  anyID ownId = ts3_clientID(serverConnectionHandlerID);
+  if (clientID != ownId) {
     return;
   }
 

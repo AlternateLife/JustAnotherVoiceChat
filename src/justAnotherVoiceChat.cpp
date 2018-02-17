@@ -84,5 +84,7 @@ void JustAnotherVoiceChat_disconnect() {
 }
 
 void JustAnotherVoiceChat_updateTalking(bool talking) {
-  
+  ts3_log("Talking status changed" + std::to_string(talking), LogLevel_DEBUG);
+
+  client->setTalking(talking);
 }

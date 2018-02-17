@@ -35,28 +35,37 @@ void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
 }
 
-anyID ts3_clientID() {
+anyID ts3_clientID(uint64 serverConnectionHandlerId) {
+  // first try parameter server connection
+  uint64 connId = serverConnectionHandlerId;
+
+  if (serverConnectionHandlerId == 0) {
+    // try global connection id
+    connId = serverConnectionHandler;
+  }
+
   // check if connected to the server
-  if (serverConnectionHandler == 0) {
+  if (connId == 0) {
     ts3_log("Unable to get client ID when not connected to a server", LogLevel_WARNING);
     return 0;
   }
 
   int status;
-  int result = ts3Functions.getConnectionStatus(serverConnectionHandler, &status);
+  int result = ts3Functions.getConnectionStatus(connId, &status);
   if (result != ERROR_ok) {
     ts3_log("Unable to get server connection status", LogLevel_WARNING);
     return 0;
   }
 
   // 1 = connected, 0 = not connected
-  if (status != 1) {
+  if (status <= 0) {
+    ts3_log("Not connected to the server " + std::to_string(status), LogLevel_DEBUG);
     return 0;
   }
 
   // get client ID on this server
   anyID clientID;
-  result = ts3Functions.getClientID(serverConnectionHandler, &clientID);
+  result = ts3Functions.getClientID(connId, &clientID);
   if (result != ERROR_ok) {
     ts3_log("Unable to get client ID", LogLevel_ERROR);
     return 0;

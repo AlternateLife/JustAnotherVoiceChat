@@ -269,6 +269,8 @@ void Client::sendStatus() {
     return;
   }
 
+  ts3_log("Sending status packet", LogLevel_DEBUG);
+
   auto data = os.str();
   sendPacket((void *)data.c_str(), data.size(), NETWORK_STATUS_CHANNEL);
 }

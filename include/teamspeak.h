@@ -35,6 +35,6 @@ void ts3_log(std::string message, enum LogLevel severity);
 
 bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
 void ts3_disconnect();
-anyID ts3_clientID();
+anyID ts3_clientID(uint64 serverConnectionHandlerId = 0);
 void ts3_setClientVolumeModifier(anyID clientID, float value);
 void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
