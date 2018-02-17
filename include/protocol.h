@@ -92,7 +92,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(gameId, teamspeakId);
+    ar(gameId, teamspeakId, statusCode);
   }
 } handshakePacket_t;
 
