@@ -46,6 +46,10 @@ bool JustAnotherVoiceChat_start() {
     return false;
   }
 
+  if (client != nullptr) {
+    delete client;
+  }
+
   client = new Client();
   
   httpServer = new HttpServer();
@@ -71,6 +75,10 @@ void JustAnotherVoiceChat_stop() {
 }
 
 bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier) {
+  if (client == nullptr) {
+    return false;
+  }
+
   if (client->connect(host, port, uniqueIdentifier) == false) {
     ts3_log("Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
     return false;
@@ -80,11 +88,33 @@ bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniq
 }
 
 void JustAnotherVoiceChat_disconnect() {
+  if (client == nullptr) {
+    return;
+  }
+
   client->disconnect();
 }
 
 void JustAnotherVoiceChat_updateTalking(bool talking) {
-  ts3_log("Talking status changed" + std::to_string(talking), LogLevel_DEBUG);
+  if (client == nullptr) {
+    return;
+  }
 
   client->setTalking(talking);
+}
+
+void JustAnotherVoiceChat_updateMicrophoneMute(bool muted) {
+  if (client == nullptr) {
+    return;
+  }
+
+  client->setMicrophoneMuted(muted);
+}
+
+void JustAnotherVoiceChat_updateSpeakersMute(bool muted) {
+  if (client == nullptr) {
+    return;
+  }
+
+  client->setSpeakersMuted(muted);
 }

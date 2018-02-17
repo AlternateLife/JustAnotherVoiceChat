@@ -86,3 +86,19 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
   JustAnotherVoiceChat_updateTalking(status == STATUS_TALKING);
 }
+
+void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue) {
+  // only listen to input and output mute events
+  if (flag != CLIENT_INPUT_MUTED && flag != CLIENT_OUTPUT_MUTED) {
+    return;
+  }
+
+  // update mute state
+  bool mute = strcmp(newValue, "1") == 0;
+
+  if (flag == CLIENT_INPUT_MUTED) {
+    JustAnotherVoiceChat_updateMicrophoneMute(mute);
+  } else if (flag == CLIENT_OUTPUT_MUTED) {
+    JustAnotherVoiceChat_updateSpeakersMute(mute);
+  }
+}
