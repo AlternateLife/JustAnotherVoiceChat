@@ -43,6 +43,10 @@ private:
   std::string _host;
   uint16_t _port;
 
+  bool _talking;
+  bool _microphoneMuted;
+  bool _speakersMuted;
+
 public:
   Client();
   virtual ~Client();
@@ -51,15 +55,23 @@ public:
   void disconnect();
   bool isOpen() const;
 
+  void setTalking(bool talking);
+  void setMicrophoneMuted(bool muted);
+  void setSpeakersMuted(bool muted);
+  bool isTalking() const;
+  bool hasMicrophoneMuted() const;
+  bool hasSpeakersMuted() const;
+
 private:
   void close();
   void update();
   void abortThread();
 
   void sendHandshake();
+  void sendStatus();
   void handleMessage(ENetEvent &event);
   void handleHandshapeResponse(ENetPacket *packet);
-  void handleUpdateResponse(ENetPacket *packet);
+  void handleUpdateMessage(ENetPacket *packet);
 
   void sendResponse(int statusCode, std::string reason, int channelId);
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);

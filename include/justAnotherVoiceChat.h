@@ -36,3 +36,5 @@ void JustAnotherVoiceChat_stop();
 bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
 
 void JustAnotherVoiceChat_disconnect();
+
+void JustAnotherVoiceChat_updateTalking(bool talking);

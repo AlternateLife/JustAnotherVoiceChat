@@ -82,3 +82,7 @@ bool JustAnotherVoiceChat_connect(std::string host, uint16_t port, uint16_t uniq
 void JustAnotherVoiceChat_disconnect() {
   client->disconnect();
 }
+
+void JustAnotherVoiceChat_updateTalking(bool talking) {
+  
+}

@@ -35,9 +35,10 @@
 #define ENET_PORT 23332
 #define HTTP_PORT 23333
 
-#define NETWORK_CHANNELS 2
+#define NETWORK_CHANNELS 3
 #define NETWORK_HANDSHAKE_CHANNEL 0
 #define NETWORK_UPDATE_CHANNEL 1
+#define NETWORK_STATUS_CHANNEL 2
 
 #define STATUS_CODE_OK 0
 #define STATUS_CODE_UNKNOWN_ERROR 1
@@ -94,3 +95,14 @@ typedef struct {
     ar(positions, volumes);
   }
 } updatePacket_t;
+
+typedef struct {
+  bool talking;
+  bool microphoneMuted;
+  bool speakersMuted;
+
+  template <class Archive>
+  void serialize(Archive &ar) {
+    ar(talking, microphoneMuted, speakersMuted);
+  }
+} statusPacket_t;

@@ -36,6 +36,9 @@ Client::Client() {
   _thread = nullptr;
   _running = false;
   _uniqueIdentifier = 0;
+  _talking = false;
+  _microphoneMuted = false;
+  _speakersMuted = false;
 }
 
 Client::~Client() {
@@ -125,6 +128,36 @@ bool Client::isOpen() const {
   return _client != nullptr && _peer != nullptr && _running;
 }
 
+void Client::setTalking(bool talking) {
+  _talking = talking;
+
+  sendStatus();
+}
+
+void Client::setMicrophoneMuted(bool muted) {
+  _microphoneMuted = muted;
+
+  sendStatus();
+}
+
+void Client::setSpeakersMuted(bool muted) {
+  _speakersMuted = muted;
+
+  sendStatus();
+}
+
+bool Client::isTalking() const {
+  return _talking;
+}
+
+bool Client::hasMicrophoneMuted() const {
+  return _microphoneMuted;
+}
+
+bool Client::hasSpeakersMuted() const {
+  return _speakersMuted;
+}
+
 void Client::close() {
   abortThread();
   
@@ -199,6 +232,47 @@ void Client::abortThread() {
   }
 }
 
+void Client::sendHandshake() {
+  handshakePacket_t packet;
+  packet.gameId = _uniqueIdentifier;
+  packet.teamspeakId = ts3_clientID();
+
+  // serialize payload
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  auto data = os.str();
+  sendPacket((void *)data.c_str(), data.size(), NETWORK_HANDSHAKE_CHANNEL);
+}
+
+void Client::sendStatus() {
+  statusPacket_t packet;
+  packet.talking = _talking;
+  packet.microphoneMuted = _microphoneMuted;
+  packet.speakersMuted = _speakersMuted;
+
+  // serialize payload
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  auto data = os.str();
+  sendPacket((void *)data.c_str(), data.size(), NETWORK_STATUS_CHANNEL);
+}
+
 void Client::handleMessage(ENetEvent &event) {
   switch (event.channelID) {
     case NETWORK_HANDSHAKE_CHANNEL:
@@ -206,7 +280,11 @@ void Client::handleMessage(ENetEvent &event) {
       break;
 
     case NETWORK_UPDATE_CHANNEL:
-      handleUpdateResponse(event.packet);
+      handleUpdateMessage(event.packet);
+      break;
+
+    case NETWORK_STATUS_CHANNEL:
+      
       break;
 
     default:
@@ -235,10 +313,10 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
     return;
   }
 
-  ts3_log("Handshake successful", LogLevel_INFO);
+  ts3_log("Handshake successful", LogLevel_DEBUG);
 }
 
-void Client::handleUpdateResponse(ENetPacket *packet) {
+void Client::handleUpdateMessage(ENetPacket *packet) {
   // deserialize payload
   updatePacket_t updatePacket;
 
@@ -253,7 +331,7 @@ void Client::handleUpdateResponse(ENetPacket *packet) {
     return;
   }
 
-  ts3_log("Update received: " + data, LogLevel_INFO);
+  ts3_log("Update received: " + data, LogLevel_DEBUG);
 }
 
 void Client::sendResponse(int statusCode, std::string reason, int channelId) {
@@ -274,26 +352,6 @@ void Client::sendResponse(int statusCode, std::string reason, int channelId) {
 
   auto data = os.str();
   sendPacket((void *)data.c_str(), data.size(), channelId);
-}
-
-void Client::sendHandshake() {
-  handshakePacket_t packet;
-  packet.gameId = _uniqueIdentifier;
-  packet.teamspeakId = ts3_clientID();
-
-  // serialize payload
-  std::ostringstream os;
-
-  try {
-    cereal::BinaryOutputArchive archive(os);
-    archive(packet);
-  } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
-    return;
-  }
-
-  auto data = os.str();
-  sendPacket((void *)data.c_str(), data.size(), NETWORK_HANDSHAKE_CHANNEL);
 }
 
 void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {

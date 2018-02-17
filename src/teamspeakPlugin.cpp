@@ -78,15 +78,9 @@ void ts3plugin_shutdown() {
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
-  char name[512];
-  if (ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512) != ERROR_ok) {
-    ts3_log("Unable to get client's display name", LogLevel_WARNING);
+  if (clientID != ts3_clientID()) {
     return;
   }
 
-  if (status == STATUS_TALKING) {
-    ts3_log(std::string(name) + " starts talking", LogLevel_INFO);
-  } else {
-    ts3_log(std::string(name) + " stops talking", LogLevel_INFO);
-  }
+  JustAnotherVoiceChat_updateTalking(status == STATUS_TALKING);
 }
