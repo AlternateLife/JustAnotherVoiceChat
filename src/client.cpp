@@ -295,7 +295,7 @@ void Client::handleMessage(ENetEvent &event) {
 
 void Client::handleHandshapeResponse(ENetPacket *packet) {
   // deserialize payload
-  responsePacket_t responsePacket;
+  handshakeResponsePacket_t responsePacket;
 
   std::string data((char *)packet->data, packet->dataLength);
   std::istringstream is(data);
@@ -310,6 +310,16 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
 
   if (responsePacket.statusCode != STATUS_CODE_OK) {
     ts3_log("Handshake failed: " + std::to_string(responsePacket.statusCode) + ": " + responsePacket.reason , LogLevel_WARNING);
+    return;
+  }
+
+  if (ts3_connect(responsePacket.teamspeakEndpoint, responsePacket.teamspeakPort, responsePacket.teamspeakPassword) == false) {
+    ts3_log(std::string("Unable to connect to teamspeak server:") + responsePacket.teamspeakEndpoint + ":" + std::to_string(responsePacket.teamspeakPort), LogLevel_WARNING);
+    return;
+  }
+
+  if (ts3_moveToChannel(responsePacket.channelName, responsePacket.channelPassword) == false) {
+    ts3_log(std::string("Unable to move into channel ") + responsePacket.channelName, LogLevel_WARNING);
     return;
   }
 
@@ -335,7 +345,7 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
 }
 
 void Client::sendResponse(int statusCode, std::string reason, int channelId) {
-  responsePacket_t packet;
+  /*responsePacket_t packet;
   packet.statusCode = statusCode;
   packet.reason = reason;
   
@@ -351,7 +361,7 @@ void Client::sendResponse(int statusCode, std::string reason, int channelId) {
   }
 
   auto data = os.str();
-  sendPacket((void *)data.c_str(), data.size(), channelId);
+  sendPacket((void *)data.c_str(), data.size(), channelId);*/
 }
 
 void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {

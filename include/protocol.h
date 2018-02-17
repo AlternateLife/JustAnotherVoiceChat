@@ -70,11 +70,18 @@ typedef struct {
   int statusCode;
   std::string reason;
 
+  std::string teamspeakEndpoint;
+  uint16_t teamspeakPort;
+  std::string teamspeakPassword;
+
+  std::string channelName;
+  std::string channelPassword;
+
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(statusCode, reason);
+    ar(statusCode, reason, teamspeakEndpoint, teamspeakPort, teamspeakPassword, channelName, channelPassword);
   }
-} responsePacket_t;
+} handshakeResponsePacket_t;
 
 typedef struct {
   uint16_t gameId;
