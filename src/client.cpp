@@ -75,6 +75,8 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
     return false;
   }
 
+  abortThread();
+
   _uniqueIdentifier = uniqueIdentifier;
   _host = host;
   _port = port;
@@ -153,7 +155,7 @@ void Client::update() {
         case ENET_EVENT_TYPE_DISCONNECT:
           ts3_log("Connection closed", LogLevel_DEBUG);
 
-          close();
+          _running = false;
           break;
 
         case ENET_EVENT_TYPE_RECEIVE:
@@ -175,20 +177,26 @@ void Client::update() {
       _running = false;
     }
   }
+
+  close();
 }
 
 void Client::abortThread() {
   // stop thread
-  if (_running == false || _thread == nullptr) {
+  if (_thread == nullptr) {
     return;
   }
 
-  _running = false;
-  _thread->join();
+  if (_thread->get_id() != std::this_thread::get_id()) {
+    if (_thread->joinable()) {
+      _running = false;
+      _thread->join();
+    }
 
-  // delete object
-  delete _thread;
-  _thread = nullptr;
+    // delete object
+    delete _thread;
+    _thread = nullptr;
+  }
 }
 
 void Client::handleMessage(ENetEvent &event) {

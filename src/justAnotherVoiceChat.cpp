@@ -62,6 +62,7 @@ void JustAnotherVoiceChat_stop() {
   httpServer->close();
   delete httpServer;
 
+  client->disconnect();
   delete client;
 
   enet_deinitialize();
