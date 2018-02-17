@@ -318,8 +318,9 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
     return;
   }
 
-  if (ts3_moveToChannel(responsePacket.channelName, responsePacket.channelPassword) == false) {
-    ts3_log(std::string("Unable to move into channel ") + responsePacket.channelName, LogLevel_WARNING);
+  auto serverHandle =  ts3_serverConnectionHandle();
+  if (ts3_moveToChannel(serverHandle, responsePacket.channelId, responsePacket.channelPassword) == false) {
+    ts3_log(std::string("Unable to move into channel ") + std::to_string(responsePacket.channelId), LogLevel_WARNING);
     return;
   }
 

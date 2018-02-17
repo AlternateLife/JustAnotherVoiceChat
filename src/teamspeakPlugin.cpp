@@ -102,3 +102,12 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
     JustAnotherVoiceChat_updateSpeakersMute(mute);
   }
 }
+
+void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
+  anyID ownId = ts3_clientID(serverConnectionHandlerID);
+  if (ownId != clientID) {
+    return;
+  }
+
+  ts3_log("Moved to channel id " + std::to_string(newChannelID), LogLevel_DEBUG);
+}

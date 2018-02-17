@@ -1,6 +1,6 @@
 /*
- * File: include/teamspeak.h
- * Date: 08.02.2018
+ * File: src/util.cpp
+ * Date: 17.02.2018
  *
  * MIT License
  *
@@ -25,19 +25,36 @@
  * SOFTWARE.
  */
 
-#pragma once
+#include "util.h"
 
-#include <string>
-#include <teamspeak/public_definitions.h>
+#ifdef _WIN32
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#endif
 
-// wrapped functions
-void ts3_log(std::string message, enum LogLevel severity);
+std::string resolveHostname(std::string hostname) {
+  struct addrinfo hints;
+  struct addrinfo *infoptr;
 
-bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
-void ts3_disconnect();
-bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password);
-uint64 ts3_serverConnectionHandle();
+  hints.ai_family = AF_INET;
+  int result = getaddrinfo(hostname.c_str(), NULL, &hints, &infoptr);
+  if (result) {
+    return "";
+  }
 
-anyID ts3_clientID(uint64 serverConnectionHandlerId = 0);
-void ts3_setClientVolumeModifier(anyID clientID, float value);
-void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
+  // loop through resolved address list
+  char host[20];
+  for (auto p = infoptr; p != NULL; p = p->ai_next) {
+    if (getnameinfo(p->ai_addr, p->ai_addrlen, host, sizeof(host), NULL, 0, NI_NUMERICHOST) == 0) {
+      freeaddrinfo(infoptr);
+      return std::string(host);
+    }
+  }
+
+  freeaddrinfo(infoptr);
+  return "";
+}

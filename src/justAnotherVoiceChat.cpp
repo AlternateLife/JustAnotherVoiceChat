@@ -30,6 +30,11 @@
 #include <iostream>
 #include <enet/enet.h>
 
+#ifdef _WIN32
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#endif
+
 #include "protocol.h"
 #include "httpServer.h"
 #include "teamspeak.h"
@@ -46,6 +51,14 @@ bool JustAnotherVoiceChat_start() {
     return false;
   }
 
+#ifdef _WIN32
+  WSADATA data;
+  if (WSAStartup(MAKEWORD(1, 1), &data) != 0) {
+    ts3_log("Unable to initialize winsock", LogLevel_ERROR);
+    return false;
+  }
+#endif
+
   if (client != nullptr) {
     delete client;
   }
@@ -54,8 +67,6 @@ bool JustAnotherVoiceChat_start() {
   
   httpServer = new HttpServer();
   httpServer->open(HTTP_PORT);
-
-  ts3_connect("localhost", 9987, "");
 
   return true;
 }
@@ -68,6 +79,10 @@ void JustAnotherVoiceChat_stop() {
 
   client->disconnect();
   delete client;
+
+#ifdef _WIN32
+  WSACleanup();
+#endif
 
   enet_deinitialize();
 

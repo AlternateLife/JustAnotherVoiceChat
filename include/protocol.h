@@ -74,12 +74,12 @@ typedef struct {
   uint16_t teamspeakPort;
   std::string teamspeakPassword;
 
-  std::string channelName;
+  uint64_t channelId;
   std::string channelPassword;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(statusCode, reason, teamspeakEndpoint, teamspeakPort, teamspeakPassword, channelName, channelPassword);
+    ar(statusCode, reason, teamspeakEndpoint, teamspeakPort, teamspeakPassword, channelId, channelPassword);
   }
 } handshakeResponsePacket_t;
 

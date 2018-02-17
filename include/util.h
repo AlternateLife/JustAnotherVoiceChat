@@ -1,6 +1,6 @@
 /*
- * File: include/teamspeak.h
- * Date: 08.02.2018
+ * File: include/util.h
+ * Date: 17.02.2018
  *
  * MIT License
  *
@@ -28,16 +28,5 @@
 #pragma once
 
 #include <string>
-#include <teamspeak/public_definitions.h>
 
-// wrapped functions
-void ts3_log(std::string message, enum LogLevel severity);
-
-bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
-void ts3_disconnect();
-bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password);
-uint64 ts3_serverConnectionHandle();
-
-anyID ts3_clientID(uint64 serverConnectionHandlerId = 0);
-void ts3_setClientVolumeModifier(anyID clientID, float value);
-void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
+std::string resolveHostname(std::string hostname);
