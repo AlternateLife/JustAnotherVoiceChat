@@ -27,6 +27,10 @@
 
 #include "util.h"
 
+#include <string.h>
+
+#include "teamspeak.h"
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
@@ -40,9 +44,11 @@ std::string resolveHostname(std::string hostname) {
   struct addrinfo hints;
   struct addrinfo *infoptr;
 
+  memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
+
   int result = getaddrinfo(hostname.c_str(), NULL, &hints, &infoptr);
-  if (result) {
+  if (result != 0) {
     return "";
   }
 

@@ -39,8 +39,13 @@ void ts3_log(std::string message, enum LogLevel severity) {
 }
 
 bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
-  auto desiredIp = resolveHostname(host + ":" + std::to_string(port));
-  ts3_log(std::string("Desired ip: ") + desiredIp, LogLevel_DEBUG);
+  auto desiredIp = resolveHostname(host);
+  if (desiredIp.compare("") == 0) {
+    ts3_log("Unable to resolve desired hostname: " + host, LogLevel_WARNING);
+    return false;
+  }
+
+  ts3_log(std::string("Desired ip: ") + desiredIp + " for " + host, LogLevel_DEBUG);
 
   // check if server is already connected
   uint64 *serverList;
@@ -55,17 +60,16 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
   uint64 handle = serverList[index];
 
   while (handle != 0) {
-    char host[BUFFER_LENGTH] = { '\0' };
+    char handleHost[BUFFER_LENGTH] = { '\0' };
     char password[BUFFER_LENGTH] = { '\0' };
-    unsigned short port = 0;
+    unsigned short handlePort = 0;
 
-    result = ts3Functions.getServerConnectInfo(handle, host, &port, password, BUFFER_LENGTH);
+    result = ts3Functions.getServerConnectInfo(handle, handleHost, &handlePort, password, BUFFER_LENGTH);
     if (result == ERROR_ok) {
       // resolve hostname
-      auto ip = resolveHostname(std::string(host));
-
-      if (ip == desiredIp) {
-        ts3_log(std::string("Matching server found: ") + host, LogLevel_DEBUG);
+      auto ip = resolveHostname(std::string(handleHost));
+      if (desiredIp.compare(ip) == 0) {
+        ts3_log(std::string("Matching server found: ") + handleHost, LogLevel_DEBUG);
 
         // save handle
         serverConnectionHandler = handle;
