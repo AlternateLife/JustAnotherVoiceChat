@@ -200,6 +200,7 @@ void Client::close() {
   auto result = ts3_moveToChannel(serverHandle, _lastChannelId, "");
   if (result != 0) {
     ts3_log("Unable to move to saved channel " + std::to_string(_lastChannelId), LogLevel_WARNING);
+    _lastChannelId = 0;
     return;
   }
 
@@ -209,14 +210,15 @@ void Client::close() {
 void Client::update() {
   ENetEvent event;
 
-  while(_running) {
+  while(_running && _client != nullptr) {
     int code = enet_host_service(_client, &event, 100);
 
     if (code > 0) {
       switch (event.type) {
         case ENET_EVENT_TYPE_DISCONNECT:
-          ts3_log("Connection closed", LogLevel_DEBUG);
+          ts3_log("Connection closed by the server", LogLevel_DEBUG);
 
+          event.peer->data = NULL;
           _running = false;
           break;
 
@@ -249,7 +251,11 @@ void Client::abortThread() {
     return;
   }
 
+  ts3_log("Request to stop update thread", LogLevel_DEBUG);
+
   if (_thread->get_id() != std::this_thread::get_id()) {
+      ts3_log("Stopping from other thread", LogLevel_DEBUG);
+
     if (_thread->joinable()) {
       _running = false;
       _thread->join();
@@ -274,7 +280,7 @@ void Client::sendHandshake(int statusCode) {
     cereal::BinaryOutputArchive archive(os);
     archive(packet);
   } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
+    ts3_log(std::string("sendHandshake: ") + e.what(), LogLevel_ERROR);
     return;
   }
 
@@ -295,7 +301,7 @@ void Client::sendStatus() {
     cereal::BinaryOutputArchive archive(os);
     archive(packet);
   } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
+    ts3_log(std::string("sendStatus: ") + e.what(), LogLevel_ERROR);
     return;
   }
 
@@ -306,7 +312,7 @@ void Client::sendStatus() {
 void Client::handleMessage(ENetEvent &event) {
   switch (event.channelID) {
     case NETWORK_HANDSHAKE_CHANNEL:
-      handleHandshapeResponse(event.packet);
+      handleHandshakeResponse(event.packet);
       break;
 
     case NETWORK_UPDATE_CHANNEL:
@@ -323,7 +329,7 @@ void Client::handleMessage(ENetEvent &event) {
   }
 }
 
-void Client::handleHandshapeResponse(ENetPacket *packet) {
+void Client::handleHandshakeResponse(ENetPacket *packet) {
   // deserialize payload
   handshakeResponsePacket_t responsePacket;
 
@@ -334,7 +340,7 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
     cereal::BinaryInputArchive archive(is);
     archive(responsePacket);
   } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
+    ts3_log(std::string("handleHandshakeResponse: ") + e.what(), LogLevel_ERROR);
     return;
   }
 
@@ -378,7 +384,7 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
     cereal::BinaryInputArchive archive(is);
     archive(updatePacket);
   } catch (std::exception &e) {
-    ts3_log(e.what(), LogLevel_ERROR);
+    ts3_log(std::string("handleUpdateMessage: ") + e.what(), LogLevel_ERROR);
     return;
   }
 

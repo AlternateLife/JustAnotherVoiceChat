@@ -58,7 +58,7 @@ const char *ts3plugin_author() {
 }
 
 const char *ts3plugin_description() {
-  return "3D game voice plugin for communicating with the JustAnotherVoiceChat server";
+  return "3D game voice plugin for communicating with a game server based on JustAnotherVoiceChat.\nFor more information see https://ithub.com/AlternateLife/JustAnotherVoiceChat.";
 }
 
 void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
@@ -78,7 +78,7 @@ void ts3plugin_shutdown() {
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
-  // TODO: Only check on valid servers
+  // TODO: Only check on valid server
   anyID ownId = ts3_clientId(serverConnectionHandlerID);
   if (clientID != ownId) {
     return;
@@ -89,6 +89,7 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue) {
   // only listen to input and output mute events
+  // TODO: Only check on valid server
   if (flag != CLIENT_INPUT_MUTED && flag != CLIENT_OUTPUT_MUTED) {
     return;
   }
@@ -104,6 +105,7 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
 }
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
+  // debug output only
   anyID ownId = ts3_clientId(serverConnectionHandlerID);
   if (ownId != clientID) {
     return;

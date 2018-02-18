@@ -74,7 +74,7 @@ private:
   void sendHandshake(int statusCode = STATUS_CODE_OK);
   void sendStatus();
   void handleMessage(ENetEvent &event);
-  void handleHandshapeResponse(ENetPacket *packet);
+  void handleHandshakeResponse(ENetPacket *packet);
   void handleUpdateMessage(ENetPacket *packet);
 
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);

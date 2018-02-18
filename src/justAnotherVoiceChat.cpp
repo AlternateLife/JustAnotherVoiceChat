@@ -80,6 +80,8 @@ void JustAnotherVoiceChat_stop() {
   client->disconnect();
   delete client;
 
+  ts3_log("Cleanup libraries", LogLevel_DEBUG);
+
 #ifdef _WIN32
   WSACleanup();
 #endif
@@ -111,7 +113,7 @@ void JustAnotherVoiceChat_disconnect() {
 }
 
 void JustAnotherVoiceChat_updateTalking(bool talking) {
-  if (client == nullptr) {
+  if (client == nullptr || client->isOpen() == false) {
     return;
   }
 
@@ -119,7 +121,7 @@ void JustAnotherVoiceChat_updateTalking(bool talking) {
 }
 
 void JustAnotherVoiceChat_updateMicrophoneMute(bool muted) {
-  if (client == nullptr) {
+  if (client == nullptr || client->isOpen() == false) {
     return;
   }
 
@@ -127,7 +129,7 @@ void JustAnotherVoiceChat_updateMicrophoneMute(bool muted) {
 }
 
 void JustAnotherVoiceChat_updateSpeakersMute(bool muted) {
-  if (client == nullptr) {
+  if (client == nullptr || client->isOpen() == false) {
     return;
   }
 
