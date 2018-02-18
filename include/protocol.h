@@ -47,25 +47,25 @@
 #define STATUS_CODE_UNABLE_TO_MUTE_CLIENTS 4
 
 typedef struct {
-  uint16_t clientId;
+  uint16_t teamspeakId;
   float x;
   float y;
   float z;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(clientId, x, y, z);
+    ar(teamspeakId, x, y, z);
   }
 } clientPositionUpdate_t;
 
 typedef struct {
-  uint16_t clientId;
+  uint16_t teamspeakId;
   bool muted;
   float volume;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(clientId, muted, volume);
+    ar(teamspeakId, muted, volume);
   }
 } clientVolumeUpdate_t;
 

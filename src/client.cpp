@@ -395,7 +395,20 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
     return;
   }
 
-  ts3_log("Update received: " + data, LogLevel_DEBUG);
+  // handle volume changes
+  std::set<anyID> muteClients;
+  std::set<anyID> unmuteClients;
+
+  for (auto it = updatePacket.volumes.begin(); it != updatePacket.volumes.end(); it++) {
+    if ((*it).muted) {
+      muteClients.insert((*it).teamspeakId);
+    } else {
+      unmuteClients.insert((*it).teamspeakId);
+    }
+  }
+
+  ts3_muteClients(muteClients, true);
+  ts3_muteClients(unmuteClients, false);
 }
 
 void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {
