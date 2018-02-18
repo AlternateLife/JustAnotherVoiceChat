@@ -38,6 +38,7 @@ void ts3_disconnect();
 bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password);
 uint64 ts3_serverConnectionHandle();
 
-anyID ts3_clientID(uint64 serverConnectionHandlerId = 0);
+anyID ts3_clientId(uint64 serverConnectionHandlerId);
+uint64 ts3_channelId(uint64 serverConnectionHandlerId);
 void ts3_setClientVolumeModifier(anyID clientID, float value);
 void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);

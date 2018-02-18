@@ -79,7 +79,7 @@ void ts3plugin_shutdown() {
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
   // TODO: Only check on valid servers
-  anyID ownId = ts3_clientID(serverConnectionHandlerID);
+  anyID ownId = ts3_clientId(serverConnectionHandlerID);
   if (clientID != ownId) {
     return;
   }
@@ -104,7 +104,7 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
 }
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
-  anyID ownId = ts3_clientID(serverConnectionHandlerID);
+  anyID ownId = ts3_clientId(serverConnectionHandlerID);
   if (ownId != clientID) {
     return;
   }

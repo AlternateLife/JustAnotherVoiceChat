@@ -123,7 +123,7 @@ void ts3_disconnect() {
 
 bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password) {
   // get client id
-  auto clientId = ts3_clientID(serverConnectionHandler);
+  auto clientId = ts3_clientId(serverConnectionHandler);
   if (clientId == 0) {
     return false;
   }
@@ -141,23 +141,15 @@ uint64 ts3_serverConnectionHandle() {
   return serverConnectionHandler;
 }
 
-anyID ts3_clientID(uint64 serverConnectionHandlerId) {
-  // first try parameter server connection
-  uint64 connId = serverConnectionHandlerId;
-
-  if (serverConnectionHandlerId == 0) {
-    // try global connection id
-    connId = serverConnectionHandler;
-  }
-
+anyID ts3_clientId(uint64 serverConnectionHandlerId) {
   // check if connected to the server
-  if (connId == 0) {
+  if (serverConnectionHandlerId == 0) {
     ts3_log("Unable to get client ID when not connected to a server", LogLevel_WARNING);
     return 0;
   }
 
   int status;
-  int result = ts3Functions.getConnectionStatus(connId, &status);
+  int result = ts3Functions.getConnectionStatus(serverConnectionHandlerId, &status);
   if (result != ERROR_ok) {
     ts3_log("Unable to get server connection status", LogLevel_WARNING);
     return 0;
@@ -171,13 +163,25 @@ anyID ts3_clientID(uint64 serverConnectionHandlerId) {
 
   // get client ID on this server
   anyID clientID;
-  result = ts3Functions.getClientID(connId, &clientID);
+  result = ts3Functions.getClientID(serverConnectionHandlerId, &clientID);
   if (result != ERROR_ok) {
     ts3_log("Unable to get client ID", LogLevel_ERROR);
     return 0;
   }
 
   return clientID;
+}
+
+uint64 ts3_channelId(uint64 serverConnectionHandlerId) {
+  uint64 channelId;
+  auto clientId = ts3_clientId(serverConnectionHandler);
+
+  auto result = ts3Functions.getChannelOfClient(serverConnectionHandlerId, clientId, &channelId);
+  if (result != ERROR_ok) {
+    return 0;
+  }
+
+  return channelId;
 }
 
 void ts3_setClientVolumeModifier(anyID clientID, float value) {

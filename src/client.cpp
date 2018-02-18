@@ -40,6 +40,7 @@ Client::Client() {
   _talking = false;
   _microphoneMuted = false;
   _speakersMuted = false;
+  _lastChannelId = 0;
 }
 
 Client::~Client() {
@@ -179,6 +180,30 @@ void Client::close() {
   _port = 0;
   _gameId = 0;
   _teamspeakId = 0;
+
+  // move back to old teamspeak channel
+  if (_lastChannelId == 0) {
+    return;
+  }
+
+  auto serverHandle = ts3_serverConnectionHandle();
+  if (serverHandle == 0) {
+    return;
+  }
+
+  auto channelId = ts3_channelId(serverHandle);
+  if (channelId == _lastChannelId) {
+    return;
+  }
+
+  // TODO: Save channel password
+  auto result = ts3_moveToChannel(serverHandle, _lastChannelId, "");
+  if (result != 0) {
+    ts3_log("Unable to move to saved channel " + std::to_string(_lastChannelId), LogLevel_WARNING);
+    return;
+  }
+
+  _lastChannelId = 0;
 }
 
 void Client::update() {
@@ -324,7 +349,10 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
     return;
   }
 
+  // save old channel for later use
   auto serverHandle =  ts3_serverConnectionHandle();
+  auto lastChannelId = ts3_channelId(serverHandle);
+  
   if (ts3_moveToChannel(serverHandle, responsePacket.channelId, responsePacket.channelPassword) == false) {
     ts3_log(std::string("Unable to move into channel ") + std::to_string(responsePacket.channelId), LogLevel_WARNING);
     sendHandshake(STATUS_CODE_NOT_MOVED_TO_CHANNEL);
@@ -332,7 +360,8 @@ void Client::handleHandshapeResponse(ENetPacket *packet) {
   }
 
   // connection on teamspeak server is valid, save teamspeak id
-  _teamspeakId = ts3_clientID(serverHandle);
+  _teamspeakId = ts3_clientId(serverHandle);
+  _lastChannelId = lastChannelId;
 
   sendHandshake();
   ts3_log("Handshake successful", LogLevel_DEBUG);

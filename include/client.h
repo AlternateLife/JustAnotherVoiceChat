@@ -45,6 +45,7 @@ private:
   uint16_t _teamspeakId;
   std::string _host;
   uint16_t _port;
+  uint64_t _lastChannelId;
 
   bool _talking;
   bool _microphoneMuted;
