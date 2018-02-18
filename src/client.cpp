@@ -107,7 +107,7 @@ void Client::disconnect() {
   abortThread();
 
   ENetEvent event;
-  while (enet_host_service(_client, &event, 3000) > 0) {
+  while (_client != nullptr && enet_host_service(_client, &event, 3000) > 0) {
     if (event.type == ENET_EVENT_TYPE_DISCONNECT) {
       break;
     }
@@ -198,7 +198,7 @@ void Client::close() {
 
   // TODO: Save channel password
   auto result = ts3_moveToChannel(serverHandle, _lastChannelId, "");
-  if (result != 0) {
+  if (result == false) {
     ts3_log("Unable to move to saved channel " + std::to_string(_lastChannelId), LogLevel_WARNING);
     _lastChannelId = 0;
     return;
@@ -251,11 +251,7 @@ void Client::abortThread() {
     return;
   }
 
-  ts3_log("Request to stop update thread", LogLevel_DEBUG);
-
   if (_thread->get_id() != std::this_thread::get_id()) {
-      ts3_log("Stopping from other thread", LogLevel_DEBUG);
-
     if (_thread->joinable()) {
       _running = false;
       _thread->join();

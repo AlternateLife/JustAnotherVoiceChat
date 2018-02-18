@@ -80,8 +80,6 @@ void JustAnotherVoiceChat_stop() {
   client->disconnect();
   delete client;
 
-  ts3_log("Cleanup libraries", LogLevel_DEBUG);
-
 #ifdef _WIN32
   WSACleanup();
 #endif

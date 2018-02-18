@@ -125,6 +125,7 @@ bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::st
   // get client id
   auto clientId = ts3_clientId(serverConnectionHandler);
   if (clientId == 0) {
+    ts3_log("Unable to get client id for channel move", LogLevel_WARNING);
     return false;
   }
 
