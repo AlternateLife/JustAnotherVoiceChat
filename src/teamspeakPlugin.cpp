@@ -58,7 +58,7 @@ const char *ts3plugin_author() {
 }
 
 const char *ts3plugin_description() {
-  return "3D game voice plugin for communicating with a game server based on JustAnotherVoiceChat.\nFor more information see https://ithub.com/AlternateLife/JustAnotherVoiceChat.";
+  return "3D game voice plugin for communicating with a game server based on JustAnotherVoiceChat.\nFor more information see https://github.com/AlternateLife/JustAnotherVoiceChat";
 }
 
 void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {

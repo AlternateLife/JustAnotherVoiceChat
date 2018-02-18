@@ -28,6 +28,7 @@
 #pragma once
 
 #include <string>
+#include <set>
 #include <teamspeak/public_definitions.h>
 
 // wrapped functions
@@ -35,9 +36,13 @@ void ts3_log(std::string message, enum LogLevel severity);
 
 bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
 void ts3_disconnect();
-bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password);
-uint64 ts3_serverConnectionHandle();
+bool ts3_moveToChannel(uint64 channelId, std::string password);
+bool ts3_muteClient(anyID clientId, bool mute);
+bool ts3_muteClients(std::set<anyID> &clients, bool mute);
+bool ts3_unmuteAllClients();
+std::set<anyID> ts3_clientsInChannel(uint64 channelId);
 
+uint64 ts3_serverConnectionHandle();
 anyID ts3_clientId(uint64 serverConnectionHandlerId);
 uint64 ts3_channelId(uint64 serverConnectionHandlerId);
 void ts3_setClientVolumeModifier(anyID clientID, float value);

@@ -197,7 +197,7 @@ void Client::close() {
   }
 
   // TODO: Save channel password
-  auto result = ts3_moveToChannel(serverHandle, _lastChannelId, "");
+  auto result = ts3_moveToChannel(_lastChannelId, "");
   if (result == false) {
     ts3_log("Unable to move to saved channel " + std::to_string(_lastChannelId), LogLevel_WARNING);
     _lastChannelId = 0;
@@ -205,6 +205,9 @@ void Client::close() {
   }
 
   _lastChannelId = 0;
+
+  // unmute all muted clients after moved out of channel
+  ts3_unmuteAllClients();
 }
 
 void Client::update() {
@@ -355,9 +358,17 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   auto serverHandle =  ts3_serverConnectionHandle();
   auto lastChannelId = ts3_channelId(serverHandle);
   
-  if (ts3_moveToChannel(serverHandle, responsePacket.channelId, responsePacket.channelPassword) == false) {
+  if (ts3_moveToChannel(responsePacket.channelId, responsePacket.channelPassword) == false) {
     ts3_log(std::string("Unable to move into channel ") + std::to_string(responsePacket.channelId), LogLevel_WARNING);
     sendHandshake(STATUS_CODE_NOT_MOVED_TO_CHANNEL);
+    return;
+  }
+
+  // mute all clients by default
+  auto clients = ts3_clientsInChannel(responsePacket.channelId);
+  if (ts3_muteClients(clients, true) == false) {
+    ts3_log("Unable to mute clients on joining channel " + std::to_string(responsePacket.channelId), LogLevel_WARNING);
+    sendHandshake(STATUS_CODE_UNABLE_TO_MUTE_CLIENTS);
     return;
   }
 

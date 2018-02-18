@@ -33,6 +33,7 @@
 #define BUFFER_LENGTH 256
 
 static uint64 serverConnectionHandler = 0;
+static std::set<anyID> mutedClients;
 
 void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
@@ -121,7 +122,7 @@ void ts3_disconnect() {
   }
 }
 
-bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::string password) {
+bool ts3_moveToChannel(uint64 channelId, std::string password) {
   // get client id
   auto clientId = ts3_clientId(serverConnectionHandler);
   if (clientId == 0) {
@@ -136,6 +137,78 @@ bool ts3_moveToChannel(uint64 serverConnectionHandler, uint64 channelId, std::st
   }
 
   return true;
+}
+
+bool ts3_muteClient(anyID clientId, bool mute) {
+  std::set<anyID> clients;
+  clients.insert(clientId);
+
+  return ts3_muteClients(clients, mute);
+}
+
+bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
+  if (clients.empty()) {
+    return true;
+  }
+
+  // create client list
+  anyID *clientIds = (anyID *)malloc((clients.size() + 1) * sizeof(anyID));
+
+  int index = 0;
+  for (auto it = clients.begin(); it != clients.end(); it++) {
+    clientIds[index++] = *it;
+  }
+
+  // terminate array with zero element
+  clientIds[index] = 0;
+
+  // apply (un-)mute on clients
+  unsigned int result;
+
+  if (mute) {
+    result = ts3Functions.requestMuteClients(serverConnectionHandler, clientIds, NULL);
+    if (result == ERROR_ok) {
+      mutedClients.insert(clients.begin(), clients.end());
+    }
+  } else {
+    result = ts3Functions.requestUnmuteClients(serverConnectionHandler, clientIds, NULL);
+    if (result == ERROR_ok) {
+      mutedClients.erase(clients.begin(), clients.end());
+    }
+  }
+
+  // cleanup list
+  free(clientIds);
+
+  return result == ERROR_ok;
+}
+
+bool ts3_unmuteAllClients() {
+  return ts3_muteClients(mutedClients, false);
+}
+
+std::set<anyID> ts3_clientsInChannel(uint64 channelId) {
+  anyID *clientList;
+  std::set<anyID> clients;
+
+  auto result = ts3Functions.getChannelClientList(serverConnectionHandler, channelId, &clientList);
+  if (result != ERROR_ok) {
+    return clients;
+  }
+
+  // put client ids into the set
+  int index = 0;
+  anyID id = clientList[index];
+
+  while (id != 0) {
+    clients.insert(id);
+
+    index++;
+    id = clientList[index];
+  }
+
+  ts3Functions.freeMemory(clientList);
+  return clients;
 }
 
 uint64 ts3_serverConnectionHandle() {
