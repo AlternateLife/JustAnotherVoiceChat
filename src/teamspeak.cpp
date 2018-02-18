@@ -168,12 +168,27 @@ bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
   if (mute) {
     result = ts3Functions.requestMuteClients(serverConnectionHandler, clientIds, NULL);
     if (result == ERROR_ok) {
-      mutedClients.insert(clients.begin(), clients.end());
+      // add all new clients to cached list
+      for (auto it = clients.begin(); it != clients.end(); it++) {
+        mutedClients.insert(*it);
+      }
     }
   } else {
     result = ts3Functions.requestUnmuteClients(serverConnectionHandler, clientIds, NULL);
     if (result == ERROR_ok) {
-      mutedClients.erase(clients.begin(), clients.end());
+      // remove all clients from cached list
+      for (auto it = clients.begin(); it != clients.end(); it++) {
+        anyID clientId = *it;
+        auto eraseIt = mutedClients.begin();
+
+        while (eraseIt != mutedClients.end()) {
+          if (*eraseIt == clientId) {
+            eraseIt = mutedClients.erase(eraseIt);
+          } else {
+            eraseIt++;
+          }
+        }
+      }
     }
   }
 

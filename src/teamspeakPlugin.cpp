@@ -78,7 +78,10 @@ void ts3plugin_shutdown() {
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
-  // TODO: Only check on valid server
+  if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
+    return;
+  }
+
   anyID ownId = ts3_clientId(serverConnectionHandlerID);
   if (clientID != ownId) {
     return;
@@ -89,7 +92,10 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue) {
   // only listen to input and output mute events
-  // TODO: Only check on valid server
+  if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
+    return;
+  }
+
   if (flag != CLIENT_INPUT_MUTED && flag != CLIENT_OUTPUT_MUTED) {
     return;
   }
@@ -105,11 +111,24 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
 }
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
-  // debug output only
-  anyID ownId = ts3_clientId(serverConnectionHandlerID);
-  if (ownId != clientID) {
+  if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
     return;
   }
 
-  ts3_log("Moved to channel id " + std::to_string(newChannelID), LogLevel_DEBUG);
+  // check if client moved into my channel
+  auto ownChannel = ts3_channelId(serverConnectionHandlerID);
+  if (ownChannel == newChannelID) {
+    ts3_log("Mute client on join", LogLevel_DEBUG);
+    ts3_muteClient(clientID, true);
+    ts3_log("Muted joined client", LogLevel_DEBUG);
+    return;
+  }
+
+  // check if client moved out of my channel
+  if (ownChannel == oldChannelID) {
+    ts3_log("Unmute client on leave", LogLevel_DEBUG);
+    ts3_muteClient(clientID, false);
+    ts3_log("Unmuted left client", LogLevel_DEBUG);
+    return;
+  }
 }
