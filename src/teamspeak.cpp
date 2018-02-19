@@ -28,7 +28,6 @@
 #include "teamspeak.h"
 
 #include "teamspeakPlugin.h"
-#include "util.h"
 
 #define BUFFER_LENGTH 256
 
@@ -39,18 +38,10 @@ void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
 }
 
-bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
-  auto desiredIp = resolveHostname(host);
-  if (desiredIp.compare("") == 0) {
-    ts3_log("Unable to resolve desired hostname: " + host, LogLevel_WARNING);
-    return false;
-  }
-
-  ts3_log(std::string("Desired ip: ") + desiredIp + " for " + host, LogLevel_DEBUG);
-
+bool ts3_verifyServer(std::string uniqueIdentifier) {
   // check if server is already connected
   uint64 *serverList;
-  int result = ts3Functions.getServerConnectionHandlerList(&serverList);
+  auto result = ts3Functions.getServerConnectionHandlerList(&serverList);
   if (result != ERROR_ok) {
     ts3_log("Unable to get server list", LogLevel_ERROR);
     return false;
@@ -59,25 +50,21 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
   // search for host in list, skip entry because it is 1 every time
   int index = 0;
   uint64 handle = serverList[index];
+  serverConnectionHandler = 0;
 
   while (handle != 0) {
-    char handleHost[BUFFER_LENGTH] = { '\0' };
-    char password[BUFFER_LENGTH] = { '\0' };
-    unsigned short handlePort = 0;
-
-    result = ts3Functions.getServerConnectInfo(handle, handleHost, &handlePort, password, BUFFER_LENGTH);
+    // get server's unique identifier
+    char *uid;
+    result = ts3Functions.getServerVariableAsString(handle, VIRTUALSERVER_UNIQUE_IDENTIFIER, &uid);
     if (result == ERROR_ok) {
-      // resolve hostname
-      auto ip = resolveHostname(std::string(handleHost));
-      if (desiredIp.compare(ip) == 0) {
-        ts3_log(std::string("Matching server found: ") + handleHost, LogLevel_DEBUG);
-
-        // save handle
+      if (uniqueIdentifier.compare(uid) == 0) {
         serverConnectionHandler = handle;
+        ts3Functions.freeMemory(uid);
+
         break;
       }
-    } else {
-      ts3_log("Unable to get server connection status " + std::to_string(handle), LogLevel_ERROR);
+
+      ts3Functions.freeMemory(uid);
     }
 
     // get next handle
@@ -88,38 +75,7 @@ bool ts3_connect(std::string host, uint16_t port, std::string serverPassword) {
   // server list needs to be freeded after usage
   ts3Functions.freeMemory(serverList);
 
-  if (serverConnectionHandler != 0) {
-    return true;
-  }
-
-  // create connection handler if needed
-  result = ts3Functions.spawnNewServerConnectionHandler(0, &serverConnectionHandler);
-  if (result != ERROR_ok) {
-    ts3_log("Unable to spawn server connection handler", LogLevel_ERROR);
-    return false;
-  }
-
-  // char *identity;
-  // result = ts3Functions.createIdentity(&identity);
-  // if (result != ERROR_ok) {
-  //   ts3_log("Unable to create a teamspeak identity", LogLevel_ERROR);
-  //   return false;
-  // }
-
-  // result = ts3Functions.startConnection(serverConnectionHandler, identity, host.c_str(), port, "Test", NULL, "", serverPassword.c_str());
-  // if (result != ERROR_ok) {
-  //   ts3_log(std::to_string(result) + ": Unable to connect to " + host + ":" + std::to_string(port), LogLevel_WARNING);
-  //   return false;
-  // }
-
-  // ts3Functions.freeMemory(identity);
-  return false;
-}
-
-void ts3_disconnect() {
-  if (serverConnectionHandler != 0) {
-    ts3Functions.destroyServerConnectionHandler(serverConnectionHandler);
-  }
+  return (serverConnectionHandler != 0);
 }
 
 bool ts3_moveToChannel(uint64 channelId, std::string password) {

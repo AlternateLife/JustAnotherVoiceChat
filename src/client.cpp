@@ -354,8 +354,8 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
     return;
   }
 
-  if (ts3_connect(responsePacket.teamspeakEndpoint, responsePacket.teamspeakPort, responsePacket.teamspeakPassword) == false) {
-    ts3_log(std::string("Unable to connect to teamspeak server:") + responsePacket.teamspeakEndpoint + ":" + std::to_string(responsePacket.teamspeakPort), LogLevel_WARNING);
+  if (ts3_verifyServer(responsePacket.teamspeakServerUniqueIdentifier) == false) {
+    ts3_log(std::string("Unable to find teamspeak server: ") + responsePacket.teamspeakServerUniqueIdentifier, LogLevel_WARNING);
     sendHandshake(STATUS_CODE_NOT_CONNECTED_TO_SERVER);
     return;
   }

@@ -34,8 +34,7 @@
 // wrapped functions
 void ts3_log(std::string message, enum LogLevel severity);
 
-bool ts3_connect(std::string host, uint16_t port, std::string serverPassword);
-void ts3_disconnect();
+bool ts3_verifyServer(std::string uniqueIdentifier);
 bool ts3_moveToChannel(uint64 channelId, std::string password);
 bool ts3_muteClient(anyID clientId, bool mute);
 bool ts3_muteClients(std::set<anyID> &clients, bool mute);
