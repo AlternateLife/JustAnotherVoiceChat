@@ -91,9 +91,14 @@ typedef struct {
   uint16_t teamspeakId;
   int statusCode;
 
+  int versionMajor;
+  int versionMinor;
+  int versionPatch;
+  int versionBuild;
+
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(gameId, teamspeakId, statusCode);
+    ar(gameId, teamspeakId, statusCode, versionMajor, versionMinor, versionPatch, versionBuild);
   }
 } handshakePacket_t;
 

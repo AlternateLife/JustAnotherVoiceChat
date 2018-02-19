@@ -115,6 +115,11 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
     return;
   }
 
+  // skip the check for myself
+  if (clientID == ts3_clientId(serverConnectionHandlerID)) {
+      return;
+  }
+
   // check if client moved into my channel
   auto ownChannel = ts3_channelId(serverConnectionHandlerID);
   if (ownChannel == newChannelID) {

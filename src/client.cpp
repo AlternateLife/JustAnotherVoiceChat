@@ -29,6 +29,7 @@
 
 #include "teamspeak.h"
 #include "protocol.h"
+#include "version.h"
 
 Client::Client() {
   _client = nullptr;
@@ -271,6 +272,11 @@ void Client::sendHandshake(int statusCode) {
   packet.gameId = _gameId;
   packet.teamspeakId = _teamspeakId;
   packet.statusCode = statusCode;
+  
+  packet.versionMajor = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
+  packet.versionMinor = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
+  packet.versionPatch = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
+  packet.versionBuild = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
 
   // serialize payload
   std::ostringstream os;
