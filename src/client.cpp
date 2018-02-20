@@ -415,7 +415,7 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
   std::set<anyID> muteClients;
   std::set<anyID> unmuteClients;
 
-  for (auto it = updatePacket.volumes.begin(); it != updatePacket.volumes.end(); it++) {
+  for (auto it = updatePacket.audioUpdates.begin(); it != updatePacket.audioUpdates.end(); it++) {
     if ((*it).muted) {
       ts3_log("Mute teamspeak user " + std::to_string((*it).teamspeakId), LogLevel_DEBUG);
 

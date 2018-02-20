@@ -62,12 +62,13 @@ typedef struct {
   uint16_t teamspeakId;
   bool muted;
   float volume;
+  std::string filterKey;
 
   template <class Archive>
   void serialize(Archive &ar) {
     ar(CEREAL_NVP(teamspeakId), CEREAL_NVP(muted), CEREAL_NVP(volume));
   }
-} clientVolumeUpdate_t;
+} clientAudioUpdate_t;
 
 typedef struct {
   int statusCode;
@@ -101,12 +102,12 @@ typedef struct {
 } handshakePacket_t;
 
 typedef struct {
-  std::vector<clientPositionUpdate_t> positions;
-  std::vector<clientVolumeUpdate_t> volumes;
+  std::vector<clientPositionUpdate_t> positionUpdates;
+  std::vector<clientAudioUpdate_t> audioUpdates;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(positions), CEREAL_NVP(volumes));
+    ar(CEREAL_NVP(positionUpdates), CEREAL_NVP(audioUpdates));
   }
 } updatePacket_t;
 
