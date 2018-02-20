@@ -70,6 +70,11 @@ bool HttpServer::isOpen() const {
 }
 
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
+  if (JustAnotherVoiceChat_isIngame()) {
+    const char *page = "<html><body>Already in-game</body></html>";
+    return sendResponse(connection, page, MHD_HTTP_ACCEPTED);
+  }
+
   // ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
 
   // get query parameters
@@ -89,12 +94,15 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
   }
 
   if (host == NULL || port == NULL || uniqueIdentifier == NULL) {
-    const char *page = "<html><body>Missing parameters</body></body>";
+    const char *page = "<html><body>Missing parameters</body></html>";
     return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
   }
 
   ts3_log(std::string("Connect: ") + host + ":" + port, LogLevel_INFO);
-  JustAnotherVoiceChat_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier));
+  if (JustAnotherVoiceChat_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier)) == false) {
+    const char *page = "<html><body>Unable to connect</body></html>";
+    return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
+  }
 
   // send response
   const char *page = "<html><body>OK</body></html>";
