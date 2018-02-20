@@ -54,7 +54,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(teamspeakId, x, y, z);
+    ar(CEREAL_NVP(teamspeakId), CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z));
   }
 } clientPositionUpdate_t;
 
@@ -65,7 +65,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(teamspeakId, muted, volume);
+    ar(CEREAL_NVP(teamspeakId), CEREAL_NVP(muted), CEREAL_NVP(volume));
   }
 } clientVolumeUpdate_t;
 
@@ -80,7 +80,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(statusCode, reason, teamspeakServerUniqueIdentifier, channelId, channelPassword);
+    ar(CEREAL_NVP(statusCode), CEREAL_NVP(reason), CEREAL_NVP(teamspeakServerUniqueIdentifier), CEREAL_NVP(channelId), CEREAL_NVP(channelPassword));
   }
 } handshakeResponsePacket_t;
 
@@ -96,7 +96,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(gameId, teamspeakId, statusCode, versionMajor, versionMinor, versionPatch, versionBuild);
+    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode), CEREAL_NVP(versionMajor), CEREAL_NVP(versionMinor), CEREAL_NVP(versionPatch), CEREAL_NVP(versionBuild));
   }
 } handshakePacket_t;
 
@@ -106,7 +106,7 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(positions, volumes);
+    ar(CEREAL_NVP(positions), CEREAL_NVP(volumes));
   }
 } updatePacket_t;
 
@@ -117,6 +117,6 @@ typedef struct {
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(talking, microphoneMuted, speakersMuted);
+    ar(CEREAL_NVP(talking), CEREAL_NVP(microphoneMuted), CEREAL_NVP(speakersMuted));
   }
 } statusPacket_t;

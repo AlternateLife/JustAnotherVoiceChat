@@ -65,11 +65,17 @@ bool ts3_verifyServer(std::string uniqueIdentifier) {
       }
 
       ts3Functions.freeMemory(uid);
+    } else {
+      ts3_log(std::to_string(result) + ": Failed to get server unique identifier", LogLevel_WARNING);
     }
 
     // get next handle
     index++;
     handle = serverList[index];
+  }
+
+  if (serverConnectionHandler == 0) {
+    ts3_log("Unable to find server match for " + uniqueIdentifier, LogLevel_WARNING);
   }
 
   // server list needs to be freeded after usage

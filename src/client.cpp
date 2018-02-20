@@ -391,7 +391,7 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
   updatePacket_t updatePacket;
 
   std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is;
+  std::istringstream is(data);
 
   try {
     cereal::BinaryInputArchive archive(is);

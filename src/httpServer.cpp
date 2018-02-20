@@ -70,22 +70,22 @@ bool HttpServer::isOpen() const {
 }
 
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
-  ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
+  // ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
 
   // get query parameters
   const char *host = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "host");
   if (host != NULL) {
-    ts3_log(std::string("\tHost: ") + host, LogLevel_DEBUG);
+    // ts3_log(std::string("\tHost: ") + host, LogLevel_DEBUG);
   }
 
   const char *port = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "port");
   if (port != NULL) {
-    ts3_log(std::string("\tPort: ") + port, LogLevel_DEBUG);
+    // ts3_log(std::string("\tPort: ") + port, LogLevel_DEBUG);
   }
 
   const char *uniqueIdentifier = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "uid");
   if (uniqueIdentifier != NULL) {
-    ts3_log(std::string("\tUID: ") + uniqueIdentifier, LogLevel_DEBUG);
+    // ts3_log(std::string("\tUID: ") + uniqueIdentifier, LogLevel_DEBUG);
   }
 
   if (host == NULL || port == NULL || uniqueIdentifier == NULL) {
