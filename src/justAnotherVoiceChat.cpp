@@ -133,3 +133,11 @@ void JustAnotherVoiceChat_updateSpeakersMute(bool muted) {
 
   client->setSpeakersMuted(muted);
 }
+
+bool JustAnotherVoiceChat_isIngame() {
+  if (client == nullptr || client->isOpen() == false) {
+    return false;
+  }
+
+  return client->isIngame();
+}

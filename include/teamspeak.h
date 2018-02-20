@@ -46,3 +46,5 @@ anyID ts3_clientId(uint64 serverConnectionHandlerId);
 uint64 ts3_channelId(uint64 serverConnectionHandlerId);
 void ts3_setClientVolumeModifier(anyID clientID, float value);
 void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
+bool ts3_isInputMuted(uint64 serverConnectionHandlerId);
+bool ts3_isOutputMuted(uint64 serverConnectionHandlerId);

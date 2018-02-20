@@ -269,3 +269,44 @@ void ts3_setClientVolumeModifier(anyID clientID, float value) {
 void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position) {
 
 }
+
+bool ts3_isInputMuted(uint64 serverConnectionHandlerId) {
+  int hardwareStatus;
+  int deactivated;
+  int muted;
+
+  if (ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_INPUT_HARDWARE, &hardwareStatus) != ERROR_ok) {
+    return false;
+  } else if (hardwareStatus == HARDWAREINPUT_DISABLED) {
+    return true;
+  }
+
+  if (ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_INPUT_DEACTIVATED, &deactivated) != ERROR_ok) {
+    return false;
+  } else if (deactivated == INPUT_DEACTIVATED) {
+    return true;
+  }
+
+  if (ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_INPUT_MUTED, &muted) != ERROR_ok) {
+    return false;
+  }
+
+  return muted == MUTEINPUT_MUTED;
+}
+
+bool ts3_isOutputMuted(uint64 serverConnectionHandlerId) {
+  int hardwareStatus;
+  int muted;
+
+  if (ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_OUTPUT_HARDWARE, &hardwareStatus) != ERROR_ok) {
+    return false;
+  } else if (hardwareStatus == HARDWAREOUTPUT_DISABLED) {
+    return true;
+  }
+
+  if (ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_OUTPUT_MUTED, &muted) != ERROR_ok) {
+    return false;
+  }
+
+  return muted == MUTEOUTPUT_MUTED;
+}

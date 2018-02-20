@@ -58,6 +58,7 @@ public:
   bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
   void disconnect();
   bool isOpen() const;
+  bool isIngame() const;
 
   void setTalking(bool talking);
   void setMicrophoneMuted(bool muted);

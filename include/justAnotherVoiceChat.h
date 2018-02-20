@@ -42,3 +42,5 @@ void JustAnotherVoiceChat_updateTalking(bool talking);
 void JustAnotherVoiceChat_updateMicrophoneMute(bool muted);
 
 void JustAnotherVoiceChat_updateSpeakersMute(bool muted);
+
+bool JustAnotherVoiceChat_isIngame();

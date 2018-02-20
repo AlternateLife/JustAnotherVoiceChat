@@ -133,6 +133,10 @@ bool Client::isOpen() const {
   return _client != nullptr && _peer != nullptr && _running;
 }
 
+bool Client::isIngame() const {
+  return isOpen() && _gameId != 0 && _teamspeakId != 0;
+}
+
 void Client::setTalking(bool talking) {
   _talking = talking;
 
@@ -384,6 +388,12 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
 
   sendHandshake();
   ts3_log("Handshake successful", LogLevel_DEBUG);
+
+  // get initial sound status
+  _microphoneMuted = ts3_isInputMuted(serverHandle);
+  _speakersMuted = ts3_isOutputMuted(serverHandle);
+
+  sendStatus();
 }
 
 void Client::handleUpdateMessage(ENetPacket *packet) {

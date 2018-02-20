@@ -117,7 +117,12 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
 
   // skip the check for myself
   if (clientID == ts3_clientId(serverConnectionHandlerID)) {
-      return;
+    return;
+  }
+
+  // only mute if ingame
+  if (JustAnotherVoiceChat_isIngame() == false) {
+    return;
   }
 
   // check if client moved into my channel
