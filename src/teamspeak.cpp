@@ -31,8 +31,8 @@
 
 #define BUFFER_LENGTH 256
 
-static uint64 serverConnectionHandler = 0;
-static std::set<anyID> mutedClients;
+static uint64 _serverConnectionHandler = 0;
+static std::set<anyID> _mutedClients;
 
 void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
@@ -50,7 +50,7 @@ bool ts3_verifyServer(std::string uniqueIdentifier) {
   // search for host in list, skip entry because it is 1 every time
   int index = 0;
   uint64 handle = serverList[index];
-  serverConnectionHandler = 0;
+  _serverConnectionHandler = 0;
 
   while (handle != 0) {
     // get server's unique identifier
@@ -58,7 +58,7 @@ bool ts3_verifyServer(std::string uniqueIdentifier) {
     result = ts3Functions.getServerVariableAsString(handle, VIRTUALSERVER_UNIQUE_IDENTIFIER, &uid);
     if (result == ERROR_ok) {
       if (uniqueIdentifier.compare(uid) == 0) {
-        serverConnectionHandler = handle;
+        _serverConnectionHandler = handle;
         ts3Functions.freeMemory(uid);
 
         break;
@@ -74,25 +74,25 @@ bool ts3_verifyServer(std::string uniqueIdentifier) {
     handle = serverList[index];
   }
 
-  if (serverConnectionHandler == 0) {
+  if (_serverConnectionHandler == 0) {
     ts3_log("Unable to find server match for " + uniqueIdentifier, LogLevel_WARNING);
   }
 
   // server list needs to be freeded after usage
   ts3Functions.freeMemory(serverList);
 
-  return (serverConnectionHandler != 0);
+  return (_serverConnectionHandler != 0);
 }
 
 bool ts3_moveToChannel(uint64 channelId, std::string password) {
   // get client id
-  auto clientId = ts3_clientId(serverConnectionHandler);
+  auto clientId = ts3_clientId(_serverConnectionHandler);
   if (clientId == 0) {
     ts3_log("Unable to get client id for channel move", LogLevel_WARNING);
     return false;
   }
 
-  auto result = ts3Functions.requestClientMove(serverConnectionHandler, clientId, channelId, password.c_str(), NULL);
+  auto result = ts3Functions.requestClientMove(_serverConnectionHandler, clientId, channelId, password.c_str(), NULL);
   if (result != ERROR_ok) {
     ts3_log("Unable to move into the channel " + channelId, LogLevel_WARNING);
     return false;
@@ -128,24 +128,27 @@ bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
   unsigned int result;
 
   if (mute) {
-    result = ts3Functions.requestMuteClients(serverConnectionHandler, clientIds, NULL);
+    result = ts3Functions.requestMuteClients(_serverConnectionHandler, clientIds, NULL);
     if (result == ERROR_ok) {
       // add all new clients to cached list
       for (auto it = clients.begin(); it != clients.end(); it++) {
-        mutedClients.insert(*it);
+        ts3_log("Add client to cached list " + std::to_string(*it), LogLevel_DEBUG);
+        _mutedClients.insert(*it);
       }
     }
   } else {
-    result = ts3Functions.requestUnmuteClients(serverConnectionHandler, clientIds, NULL);
+    result = ts3Functions.requestUnmuteClients(_serverConnectionHandler, clientIds, NULL);
     if (result == ERROR_ok) {
       // remove all clients from cached list
       for (auto it = clients.begin(); it != clients.end(); it++) {
+        // client to be erased
         anyID clientId = *it;
-        auto eraseIt = mutedClients.begin();
-
-        while (eraseIt != mutedClients.end()) {
+        
+        auto eraseIt = _mutedClients.begin();
+        while (eraseIt != _mutedClients.end()) {
           if (*eraseIt == clientId) {
-            eraseIt = mutedClients.erase(eraseIt);
+            ts3_log("Remove client from cached list " + std::to_string(*it), LogLevel_DEBUG);
+            eraseIt = _mutedClients.erase(eraseIt);
           } else {
             eraseIt++;
           }
@@ -161,14 +164,38 @@ bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
 }
 
 bool ts3_unmuteAllClients() {
-  return ts3_muteClients(mutedClients, false);
+  if (_mutedClients.empty()) {
+    return true;
+  }
+
+  // create client list
+  anyID *clientIds = (anyID *)malloc((_mutedClients.size() + 1) * sizeof(anyID));
+
+  int index = 0;
+  for (auto it = _mutedClients.begin(); it != _mutedClients.end(); it++) {
+    ts3_log("Try to unmute client " + std::to_string(*it), LogLevel_DEBUG);
+    clientIds[index++] = *it;
+  }
+
+  // terminate array with zero element
+  clientIds[index] = 0;
+
+  // apply (un-)mute on clients
+  auto result = ts3Functions.requestUnmuteClients(_serverConnectionHandler, clientIds, NULL);
+
+  // cleanup list
+  free(clientIds);
+
+  _mutedClients.clear();
+
+  return result == ERROR_ok;
 }
 
 std::set<anyID> ts3_clientsInChannel(uint64 channelId) {
   anyID *clientList;
   std::set<anyID> clients;
 
-  auto result = ts3Functions.getChannelClientList(serverConnectionHandler, channelId, &clientList);
+  auto result = ts3Functions.getChannelClientList(_serverConnectionHandler, channelId, &clientList);
   if (result != ERROR_ok) {
     return clients;
   }
@@ -189,7 +216,7 @@ std::set<anyID> ts3_clientsInChannel(uint64 channelId) {
 }
 
 uint64 ts3_serverConnectionHandle() {
-  return serverConnectionHandler;
+  return _serverConnectionHandler;
 }
 
 anyID ts3_clientId(uint64 serverConnectionHandlerId) {
@@ -225,7 +252,7 @@ anyID ts3_clientId(uint64 serverConnectionHandlerId) {
 
 uint64 ts3_channelId(uint64 serverConnectionHandlerId) {
   uint64 channelId;
-  auto clientId = ts3_clientId(serverConnectionHandler);
+  auto clientId = ts3_clientId(serverConnectionHandlerId);
 
   auto result = ts3Functions.getChannelOfClient(serverConnectionHandlerId, clientId, &channelId);
   if (result != ERROR_ok) {

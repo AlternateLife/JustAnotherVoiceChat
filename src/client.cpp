@@ -407,8 +407,12 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
 
   for (auto it = updatePacket.volumes.begin(); it != updatePacket.volumes.end(); it++) {
     if ((*it).muted) {
+      ts3_log("Mute teamspeak user " + std::to_string((*it).teamspeakId), LogLevel_DEBUG);
+
       muteClients.insert((*it).teamspeakId);
     } else {
+      ts3_log("Unmute teamspeak user " + std::to_string((*it).teamspeakId), LogLevel_DEBUG);
+
       unmuteClients.insert((*it).teamspeakId);
     }
   }
