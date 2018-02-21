@@ -28,8 +28,6 @@
 #include "client.h"
 
 #include "teamspeak.h"
-#include "protocol.h"
-#include "version.h"
 
 Client::Client() {
   _client = nullptr;
@@ -467,22 +465,4 @@ void Client::sendPacket(void *data, size_t length, int channelId, bool reliable)
 
   auto packet = enet_packet_create(data, length, flags);
   enet_peer_send(_peer, channelId, packet);
-}
-
-bool Client::verifyProtocolVersion(int major, int minor) {
-  // check major number
-  if (major > PROTOCOL_MIN_VERSION_MAJOR) {
-    return true;
-  } else if (major < PROTOCOL_MIN_VERSION_MAJOR) {
-    return false;
-  }
-
-  // check minor number
-  if (minor > PROTOCOL_MIN_VERSION_MINOR) {
-    return true;
-  } else if (minor < PROTOCOL_MIN_VERSION_MINOR) {
-    return false;
-  }
-
-  return true;
 }

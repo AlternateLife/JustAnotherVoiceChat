@@ -138,3 +138,21 @@ typedef struct {
     ar(CEREAL_NVP(nickname));
   }
 } controlPacket_t;
+
+inline bool verifyProtocolVersion(int major, int minor) {
+  // check major number
+  if (major > PROTOCOL_MIN_VERSION_MAJOR) {
+    return true;
+  } else if (major < PROTOCOL_MIN_VERSION_MAJOR) {
+    return false;
+  }
+
+  // check minor number
+  if (minor > PROTOCOL_MIN_VERSION_MINOR) {
+    return true;
+  } else if (minor < PROTOCOL_MIN_VERSION_MINOR) {
+    return false;
+  }
+
+  return true;
+}
