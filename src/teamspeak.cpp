@@ -33,6 +33,7 @@
 
 static uint64 _serverConnectionHandler = 0;
 static std::set<anyID> _mutedClients;
+static std::string _originalNickname "";
 
 void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
@@ -213,6 +214,47 @@ std::set<anyID> ts3_clientsInChannel(uint64 channelId) {
 
   ts3Functions.freeMemory(clientList);
   return clients;
+}
+
+bool ts3_setNickname(std::string nickname) {
+  if (_serverConnectionHandler == 0) {
+    return false;
+  }
+
+  if (_originalNickname.compare("") == 0) {
+    // save original nickname
+    char *originalNickname;
+    if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, &originalNickname) != ERROR_ok) {
+      ts3_log("Unable to get original nickname", LogLevel_WARNING);
+      _originalNickname = "";
+      return false;
+    }
+
+    _originalNickname = std::string(originalNickname);
+  }
+
+  // set new nickname
+  if (ts3Functions.setClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, nickname.c_str()) != ERROR_ok) {
+    ts3_log("Unable to rename client to " + nickname, LogLevel_WARNING);
+    return false;
+  }
+
+  return true;
+}
+
+bool ts3_resetNickname() {
+  if (_originalNickname.compare("") == 0) {
+    return true;
+  }
+
+  if (ts3Functions.setClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, _originalNickname.c_str()) != ERROR_ok) {
+    ts3_log("Unable to reset nickname to original " + _originalNickname, LogLevel_WARNING);
+    return false;
+  }
+
+  _originalNickname = "";
+
+  return true;
 }
 
 uint64 ts3_serverConnectionHandle() {
