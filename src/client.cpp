@@ -359,6 +359,8 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   if (verifyProtocolVersion(responsePacket.protocolVersionMajor, responsePacket.protocolVersionMinor) == false) {
     ts3_log("Server uses an outdated protocol version: " + std::to_string(responsePacket.protocolVersionMajor) + "." + std::to_string(responsePacket.protocolVersionMinor), LogLevel_WARNING);
     sendHandshake(STATUS_CODE_OUTDATED_PROTOCOL_VERSION);
+
+    disconnect();
     return;
   }
 
