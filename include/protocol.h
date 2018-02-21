@@ -32,6 +32,11 @@
 #include <cereal/types/string.hpp>
 #include <sstream>
 
+#define PROTOCOL_VERSION_MAJOR 1
+#define PROTOCOL_VERSION_MINOR 0
+#define PROTOCOL_MIN_VERSION_MAJOR 1
+#define PROTOCOL_MIN_VERSION_MINOR 0
+
 #define ENET_PORT 23332
 #define HTTP_PORT 23333
 
@@ -46,6 +51,7 @@
 #define STATUS_CODE_NOT_CONNECTED_TO_SERVER 2
 #define STATUS_CODE_NOT_MOVED_TO_CHANNEL 3
 #define STATUS_CODE_UNABLE_TO_MUTE_CLIENTS 4
+#define STATUS_CODE_OUTDATED_PROTOCOL_VERSION 5
 
 typedef struct {
   uint16_t teamspeakId;
@@ -75,6 +81,9 @@ typedef struct {
   int statusCode;
   std::string reason;
 
+  int protocolVersionMajor;
+  int protocolVersionMinor;
+
   std::string teamspeakServerUniqueIdentifier;
 
   uint64_t channelId;
@@ -91,14 +100,12 @@ typedef struct {
   uint16_t teamspeakId;
   int statusCode;
 
-  int versionMajor;
-  int versionMinor;
-  int versionPatch;
-  int versionBuild;
+  int protocolVersionMajor;
+  int protocolVersionMinor;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode), CEREAL_NVP(versionMajor), CEREAL_NVP(versionMinor), CEREAL_NVP(versionPatch), CEREAL_NVP(versionBuild));
+    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode), CEREAL_NVP(protocolVersionMajor), CEREAL_NVP(protocolVersionMinor));
   }
 } handshakePacket_t;
 

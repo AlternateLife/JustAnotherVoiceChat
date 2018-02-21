@@ -80,4 +80,5 @@ private:
   void handleControlMessage(ENetPacket *packet);
 
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
+  bool verifyProtocolVersion(int major, int minor);
 };

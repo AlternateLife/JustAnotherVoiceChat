@@ -278,10 +278,8 @@ void Client::sendHandshake(int statusCode) {
   packet.teamspeakId = _teamspeakId;
   packet.statusCode = statusCode;
   
-  packet.versionMajor = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
-  packet.versionMinor = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
-  packet.versionPatch = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
-  packet.versionBuild = JUSTANOTHERVOICECHAT_VERSION_MAJOR;
+  packet.protocolVersionMajor = PROTOCOL_VERSION_MAJOR;
+  packet.protocolVersionMinor = PROTOCOL_VERSION_MINOR;
 
   // serialize payload
   std::ostringstream os;
@@ -356,6 +354,13 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
 
   if (responsePacket.statusCode != STATUS_CODE_OK) {
     ts3_log("Handshake failed: " + std::to_string(responsePacket.statusCode) + ": " + responsePacket.reason , LogLevel_WARNING);
+    return;
+  }
+
+  // compare protocol versions
+  if (verifyProtocolVersion(responsePacket.protocolVersionMajor, responsePacket.protocolVersionMinor) == false) {
+    ts3_log("Server uses an outdated protocol version: " + std::to_string(responsePacket.protocolVersionMajor) + "." + std::to_string(responsePacket.protocolVersionMinor), LogLevel_WARNING);
+    sendHandshake(STATUS_CODE_OUTDATED_PROTOCOL_VERSION);
     return;
   }
 
@@ -462,4 +467,22 @@ void Client::sendPacket(void *data, size_t length, int channelId, bool reliable)
 
   auto packet = enet_packet_create(data, length, flags);
   enet_peer_send(_peer, channelId, packet);
+}
+
+bool Client::verifyProtocolVersion(int major, int minor) {
+  // check major number
+  if (major > PROTOCOL_MIN_VERSION_MAJOR) {
+    return true;
+  } else if (major < PROTOCOL_MIN_VERSION_MAJOR) {
+    return false;
+  }
+
+  // check minor number
+  if (minor > PROTOCOL_MIN_VERSION_MINOR) {
+    return true;
+  } else if (minor < PROTOCOL_MIN_VERSION_MINOR) {
+    return false;
+  }
+
+  return true;
 }
