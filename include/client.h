@@ -77,6 +77,7 @@ private:
   void handleMessage(ENetEvent &event);
   void handleHandshakeResponse(ENetPacket *packet);
   void handleUpdateMessage(ENetPacket *packet);
+  void handleControlMessage(ENetPacket *packet);
 
   void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
 };

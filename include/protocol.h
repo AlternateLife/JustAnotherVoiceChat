@@ -35,10 +35,11 @@
 #define ENET_PORT 23332
 #define HTTP_PORT 23333
 
-#define NETWORK_CHANNELS 3
+#define NETWORK_CHANNELS 4
 #define NETWORK_HANDSHAKE_CHANNEL 0
 #define NETWORK_UPDATE_CHANNEL 1
 #define NETWORK_STATUS_CHANNEL 2
+#define NETWORK_CONTROL_CHANNEL 3
 
 #define STATUS_CODE_OK 0
 #define STATUS_CODE_UNKNOWN_ERROR 1
@@ -121,3 +122,12 @@ typedef struct {
     ar(CEREAL_NVP(talking), CEREAL_NVP(microphoneMuted), CEREAL_NVP(speakersMuted));
   }
 } statusPacket_t;
+
+typedef struct {
+  std::string nickname;
+
+  template <class Archive>
+  void serialize(Archive &ar) {
+    ar(CEREAL_NVP(nickname));
+  }
+} controlPacket_t;

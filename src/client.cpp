@@ -211,8 +211,9 @@ void Client::close() {
 
   _lastChannelId = 0;
 
-  // unmute all muted clients after moved out of channel
+  // unmute all muted clients after moved out of channel and reset custom nickname
   ts3_unmuteAllClients();
+  ts3_resetNickname();
 }
 
 void Client::update() {
@@ -328,8 +329,8 @@ void Client::handleMessage(ENetEvent &event) {
       handleUpdateMessage(event.packet);
       break;
 
-    case NETWORK_STATUS_CHANNEL:
-      
+    case NETWORK_CONTROL_CHANNEL:
+      handleControlMessage(event.packet);
       break;
 
     default:
@@ -429,6 +430,27 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
 
   ts3_muteClients(muteClients, true);
   ts3_muteClients(unmuteClients, false);
+}
+
+void Client::handleControlMessage(ENetPacket *packet) {
+  // deserialize payload
+  controlPacket_t controlPacket;
+
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is(data);
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(controlPacket);
+  } catch (std::exception &e) {
+    ts3_log(std::string("handleControlMessage: ") + e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  // handle control packet
+  if (controlPacket.nickname.compare("") != 0) {
+    ts3_setNickname(controlPacket.nickname);
+  }
 }
 
 void Client::sendPacket(void *data, size_t length, int channelId, bool reliable) {

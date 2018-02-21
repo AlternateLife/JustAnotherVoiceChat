@@ -33,7 +33,7 @@
 
 static uint64 _serverConnectionHandler = 0;
 static std::set<anyID> _mutedClients;
-static std::string _originalNickname "";
+static std::string _originalNickname = "";
 
 void ts3_log(std::string message, enum LogLevel severity) {
   ts3Functions.logMessage(message.c_str(), severity, "JustAnotherVoiceChat", 0);
