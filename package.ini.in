@@ -1,0 +1,7 @@
+Name = JustAnotherVoiceChat
+Type = Plugin
+Author = JustAnotherVoiceChat
+Version = @JustAnotherVoiceChat_VERSION_MAJOR@.@JustAnotherVoiceChat_VERSION_MINOR@.@JustAnotherVoiceChat_VERSION_PATCH@.@JustAnotherVoiceChat_VERSION_TWEAK@
+Platforms = win64, win32, linux64, linux32, mac
+Description = "3D game voice plugin for communicating with a game server beased on JustAnotherVoiceChat.\nFor more information see https://github.com/AlternateLife/JustAnotherVoiceChat"
+Api = 22

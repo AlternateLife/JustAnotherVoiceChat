@@ -4,9 +4,9 @@
 
 This is the teamspeak 3 plugin whichs conects to the JustAnotherVoiceChat server to control 3D voice communication.
 
-## Setup
+## Usage
 
-Place the plugin files in the teamspeak 3 client plugin directory.
+Use the provided teamspeak 3 plugin package you can download in the release section.
 
 ## Development
 
