@@ -1,5 +1,5 @@
 /*
- * File: test.cpp
+ * File: tests/ts3mock.cpp
  * Date: 08.02.2018
  *
  * MIT License

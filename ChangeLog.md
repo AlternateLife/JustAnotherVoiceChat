@@ -1,6 +1,6 @@
 # ChangeLog
 
-## 0.2.0.0
+## 0.2.0
  - Added basic (positioned) based communication
  - Added client renaming
  - Added client moving into custom channel
