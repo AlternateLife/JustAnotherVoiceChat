@@ -30,9 +30,12 @@
 #include <iostream>
 #include <string.h>
 #include <string>
+#include <mutex>
 
 #include "teamspeak.h"
 #include "justAnotherVoiceChat.h"
+
+static std::mutex _connectionMutex;
 
 HttpServer::HttpServer() {
   _daemon = nullptr;
@@ -47,7 +50,7 @@ bool HttpServer::open(uint16_t port) {
     return false;
   }
 
-  _daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port, NULL, NULL, &HttpServer::requestHandler, NULL, MHD_OPTION_END);
+  _daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, port, NULL, NULL, &HttpServer::requestHandler, NULL, MHD_OPTION_END);
   if (_daemon == NULL) {
     _daemon = nullptr;
     return false;
@@ -70,12 +73,17 @@ bool HttpServer::isOpen() const {
 }
 
 int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
+  if (_connectionMutex.try_lock() == false) {
+    const char *page = "<html><body>Already connecting</body></html>";
+    return sendResponse(connection, page, MHD_HTTP_IM_USED);
+  }
+
   if (JustAnotherVoiceChat_isIngame()) {
+    _connectionMutex.unlock();
+
     const char *page = "<html><body>Already in-game</body></html>";
     return sendResponse(connection, page, MHD_HTTP_ACCEPTED);
   }
-
-  // ts3_log(std::string(method) + " " + url, LogLevel_DEBUG);
 
   // get query parameters
   const char *host = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "host");
@@ -94,15 +102,21 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
   }
 
   if (host == NULL || port == NULL || uniqueIdentifier == NULL) {
+    _connectionMutex.unlock();
+
     const char *page = "<html><body>Missing parameters</body></html>";
     return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
   }
 
   ts3_log(std::string("Connect: ") + host + ":" + port, LogLevel_INFO);
   if (JustAnotherVoiceChat_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier)) == false) {
+    _connectionMutex.unlock();
+
     const char *page = "<html><body>Unable to connect</body></html>";
     return sendResponse(connection, page, MHD_HTTP_BAD_REQUEST);
   }
+
+  _connectionMutex.unlock();
 
   // send response
   const char *page = "<html><body>OK</body></html>";
