@@ -29,6 +29,8 @@
 
 #include "teamspeakPlugin.h"
 
+#include <stdlib.h>
+
 #define BUFFER_LENGTH 256
 
 static uint64 _serverConnectionHandler = 0;
@@ -95,7 +97,7 @@ bool ts3_moveToChannel(uint64 channelId, std::string password) {
 
   auto result = ts3Functions.requestClientMove(_serverConnectionHandler, clientId, channelId, password.c_str(), NULL);
   if (result != ERROR_ok) {
-    ts3_log("Unable to move into the channel " + channelId, LogLevel_WARNING);
+    ts3_log("Unable to move into the channel " + std::to_string(channelId), LogLevel_WARNING);
     return false;
   }
 

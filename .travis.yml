@@ -1,0 +1,28 @@
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+addons:
+  apt:
+    packages:
+      texinfo
+
+language: cpp
+git:
+  submodules: false
+
+before_install:
+  - sed -i -e 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git config --global http.sslVerify "false"
+  - git submodule update --init --recursive
+  - git config --global http.sslVerify "true"
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
