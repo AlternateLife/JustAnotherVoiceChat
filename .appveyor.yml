@@ -1,0 +1,59 @@
+os: Visual Studio 2017
+
+platform:
+  - x64
+  - x86
+
+configuration:
+  - Release
+
+build:
+  verbosity: minimal
+
+install:
+  - mkdir C:\projects\dependencies
+  - cd C:\projects\dependencies
+
+  # install cmake
+  - set CMAKE_URL="https://cmake.org/files/v3.8/cmake-3.8.0-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+
+before_build:
+  # get submodules
+  - cd C:\projects\JustAnotherVoiceChat
+  - ps: (Get-Content .gitmodules).replace('git@github.com:', 'https://github.com/') | Set-Content .gitmodules
+  - git submodule update --init --recursive
+
+  # build libmicrohttpd
+  - cd C:\projects\JustAnotherVoiceChat\thirdparty\libmicrohttpd\w32\VS2015
+  - if "%PLATFORM%"=="x64" (
+      msbuild libmicrohttpd.sln /p:Configuration=Release-static /p:Platform=x64 &&
+      mv Output\x64\libmicrohttpd.lib C:\projects\JustAnotherVoiceChat\thirdparty\libmicrohttpd &&
+      set generator="Visual Studio 15 2017 Win64"
+    ) 
+  - if "%PLATFORM%"=="x86" (
+      msbuild libmicrohttpd.sln /p:Configuration=Release-static /p:Platform=Win32 &&
+      mv Output\libmicrohttpd.lib C:\projects\JustAnotherVoiceChat\thirdparty\libmicrohttpd &&
+      set generator="Visual Studio 15 2017"
+    )
+  - cd C:\projects\JustAnotherVoiceChat
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake .. -G %generator%
+  - cmake --build . --config Release
+  
+  - cd src\Release
+  - if "%PLATFORM%"=="x64" (
+      mv -T JustAnotherVoiceChat.dll JustAnotherVoiceChat_win64.dll &&
+      appveyor PushArtifact JustAnotherVoiceChat_win64.dll
+    )
+  - if "%PLATFORM%"=="x86" (
+      mv -T JustAnotherVoiceChat.dll JustAnotherVoiceChat_win32.dll &&
+      appveyor PushArtifact JustAnotherVoiceChat_win32.dll
+    )

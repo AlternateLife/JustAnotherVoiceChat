@@ -1,5 +1,7 @@
 # JustAnotherVoiceChat
 
+[![Build status](https://ci.appveyor.com/api/projects/status/c8it8hcmhe6cjhpf/branch/master?svg=true)](https://ci.appveyor.com/project/markatk/justanothervoicechat/branch/master)
+
 ## Description
 
 This is the teamspeak 3 plugin whichs connects to the JustAnotherVoiceChat server to control 3D voice communication.
