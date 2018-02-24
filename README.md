@@ -5,7 +5,7 @@
 
 ## Description
 
-This is the teamspeak 3 plugin whichs connects to the JustAnotherVoiceChat server to control 3D voice communication.
+This is the teamspeak 3 plugin which connects to the JustAnotherVoiceChat server to control 3D voice communication.
 
 ## Usage
 
