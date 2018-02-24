@@ -468,5 +468,5 @@ void Client::sendPacket(void *data, size_t length, int channelId, bool reliable)
   }
 
   auto packet = enet_packet_create(data, length, flags);
-  enet_peer_send(_peer, channelId, packet);
+  enet_peer_send(_peer, (enet_uint8)channelId, packet);
 }

@@ -45,7 +45,7 @@ const char *ts3plugin_name() {
 }
 
 const char *ts3plugin_version() {
-  sprintf(versionBuffer, "%d.%d.%d.%d", JUSTANOTHERVOICECHAT_VERSION_MAJOR, JUSTANOTHERVOICECHAT_VERSION_MINOR, JUSTANOTHERVOICECHAT_VERSION_PATCH, JUSTANOTHERVOICECHAT_VERSION_BUILD);
+  snprintf(versionBuffer, sizeof(versionBuffer), "%d.%d.%d.%d", JUSTANOTHERVOICECHAT_VERSION_MAJOR, JUSTANOTHERVOICECHAT_VERSION_MINOR, JUSTANOTHERVOICECHAT_VERSION_PATCH, JUSTANOTHERVOICECHAT_VERSION_BUILD);
   return versionBuffer;
 }
 
@@ -77,7 +77,7 @@ void ts3plugin_shutdown() {
   JustAnotherVoiceChat_stop();
 }
 
-void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID) {
+void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int, anyID clientID) {
   if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
     return;
   }
@@ -90,7 +90,7 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
   JustAnotherVoiceChat_updateTalking(status == STATUS_TALKING);
 }
 
-void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue) {
+void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char*, const char* newValue) {
   // only listen to input and output mute events
   if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
     return;
@@ -110,7 +110,7 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
   }
 }
 
-void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage) {
+void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int, const char*) {
   if (serverConnectionHandlerID != ts3_serverConnectionHandle()) {
     return;
   }

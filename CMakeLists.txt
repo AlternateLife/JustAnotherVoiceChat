@@ -5,7 +5,12 @@ project(JustAnotherVoiceChat VERSION 0.2.0.0 LANGUAGES CXX)
 # Setup basic C++ and project attributes
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -31,4 +36,10 @@ enable_testing()
 
 add_subdirectory(src)
 add_subdirectory(tests)
+
+# Add dependencies
+if(NOT DEFINED CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
+  set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "No dev warnings")
+endif()
+
 add_subdirectory(thirdparty/enet)

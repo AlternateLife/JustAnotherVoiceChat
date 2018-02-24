@@ -330,11 +330,11 @@ uint64 ts3_channelId(uint64 serverConnectionHandlerId) {
   return channelId;
 }
 
-void ts3_setClientVolumeModifier(anyID clientID, float value) {
+void ts3_setClientVolumeModifier(anyID, float ) {
 
 }
 
-void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position) {
+void ts3_setClientPosition(anyID, const struct TS3_Vector *) {
 
 }
 

@@ -72,7 +72,7 @@ bool HttpServer::isOpen() const {
   return _daemon != nullptr;
 }
 
-int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url, const char *method, const char *uploadData, size_t *uploadDataSize) {
+int HttpServer::handleRequest(struct MHD_Connection *connection, const char *, const char *, const char *, size_t *) {
   if (_connectionMutex.try_lock() == false) {
     const char *page = "<html><body>Already connecting</body></html>";
     return sendResponse(connection, page, MHD_HTTP_IM_USED);
@@ -109,7 +109,7 @@ int HttpServer::handleRequest(struct MHD_Connection *connection, const char *url
   }
 
   ts3_log(std::string("Connect: ") + host + ":" + port, LogLevel_INFO);
-  if (JustAnotherVoiceChat_connect(std::string(host), std::stoi(port), std::stoi(uniqueIdentifier)) == false) {
+  if (JustAnotherVoiceChat_connect(std::string(host), (uint16_t)std::stoi(port), (uint16_t)std::stoi(uniqueIdentifier)) == false) {
     _connectionMutex.unlock();
 
     const char *page = "<html><body>Unable to connect</body></html>";
@@ -132,7 +132,7 @@ int HttpServer::sendResponse(struct MHD_Connection *connection, const char *page
   return result;
 }
 
-int HttpServer::requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *version, const char *uploadData, size_t *uploadDataSize, void **ptr) {
+int HttpServer::requestHandler(void *cls, struct MHD_Connection *connection, const char *url, const char *method, const char *, const char *uploadData, size_t *uploadDataSize, void **) {
   auto server = (HttpServer *)cls;
   return server->handleRequest(connection, url, method, uploadData, uploadDataSize);
 }

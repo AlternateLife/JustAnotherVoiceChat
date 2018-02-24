@@ -38,7 +38,7 @@
 
 static bool running = true;
 
-unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64 logId) {
+unsigned int logMessage(const char *message, LogLevel severity, const char *channel, uint64) {
   std::string logType = "";
 
   switch(severity) {
@@ -71,21 +71,21 @@ unsigned int logMessage(const char *message, LogLevel severity, const char *chan
   return 0;
 }
 
-unsigned int spawnNewServerConnectionHandler(int port, uint64 *result) {
+unsigned int spawnNewServerConnectionHandler(int, uint64 *result) {
   *result = 0x1234;
   return 0;
 }
 
-unsigned int destroyServerConnectionHandler(uint64 handler) {
+unsigned int destroyServerConnectionHandler(uint64) {
   return 0;
 }
 
-unsigned int getConnectionStatus(uint64 serverConnectionHandler, int *result) {
+unsigned int getConnectionStatus(uint64, int *result) {
   *result = 1;
   return 0;
 }
 
-unsigned int getClientId(uint64 serverConnectionHandler, anyID *result) {
+unsigned int getClientId(uint64, anyID *result) {
   *result = 4;
   return 0;
 }
@@ -93,12 +93,12 @@ unsigned int getClientId(uint64 serverConnectionHandler, anyID *result) {
 #ifdef _WIN32
 
 #else
-void signalHandler(int signum) {
+void signalHandler(int) {
   running = false;
 }
 #endif
 
-int main(int argc, char **argv) {
+int main(int, char **) {
 #ifdef _WIN32
 
 #else
@@ -124,4 +124,6 @@ int main(int argc, char **argv) {
 
   // cleanup
   ts3plugin_shutdown();
+
+  return EXIT_SUCCESS;
 }
