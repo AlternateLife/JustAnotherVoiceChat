@@ -277,7 +277,7 @@ std::string ts3_getClientIdentity() {
   char *identity;
   if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_UNIQUE_IDENTIFIER, &identity) != ERROR_ok) {
     ts3_log("Unable to get client unique identity", LogLevel_ERROR);
-    return false;
+    return "";
   }
 
   return std::string(identity);
