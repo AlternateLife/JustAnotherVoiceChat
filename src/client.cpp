@@ -52,7 +52,7 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
   }
 
   if (isOpen()) {
-    disconnect();
+    disconnect(DISCONNECT_STATUS_RECONNECT);
   }
 
   _client = enet_host_create(NULL, 1, NETWORK_CHANNELS, 0, 0);
@@ -95,12 +95,12 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
   return true;
 }
 
-void Client::disconnect() {
+void Client::disconnect(uint32_t status) {
   if (_peer == nullptr) {
     return;
   }
 
-  enet_peer_disconnect(_peer, 0);
+  enet_peer_disconnect(_peer, status);
 
   // stop main update thread
   abortThread();
@@ -362,7 +362,7 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
     ts3_log("Server uses an outdated protocol version: " + std::to_string(responsePacket.protocolVersionMajor) + "." + std::to_string(responsePacket.protocolVersionMinor), LogLevel_WARNING);
     sendHandshake(STATUS_CODE_OUTDATED_PROTOCOL_VERSION);
 
-    disconnect();
+    disconnect(DISCONNECT_STATUS_OUTDATED_SERVER);
     return;
   }
 

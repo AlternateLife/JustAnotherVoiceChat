@@ -56,7 +56,7 @@ public:
   virtual ~Client();
 
   bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
-  void disconnect();
+  void disconnect(uint32_t status = DISCONNECT_STATUS_OK);
   bool isOpen() const;
   bool isIngame() const;
 
