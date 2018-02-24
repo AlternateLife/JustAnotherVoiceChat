@@ -362,7 +362,7 @@ void Client::handleMessage(ENetEvent &event) {
 
 void Client::handleProtocolResponse(ENetPacket *packet) {
   // deserialize payload
-  protocolPacket_t protocolPacket;
+  protocolResponsePacket_t protocolPacket;
 
   std::string data((char *)packet->data, packet->dataLength);
   std::istringstream is(data);
@@ -372,6 +372,13 @@ void Client::handleProtocolResponse(ENetPacket *packet) {
     archive(protocolPacket);
   } catch (std::exception &e) {
     ts3_log(std::string("handleProtocolResponse: ") + e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  if (protocolPacket.statusCode != STATUS_CODE_OK) {
+    ts3_log("Client uses an outdated protocol version: " + std::to_string(PROTOCOL_VERSION_MAJOR) "." + std::to_string(PROTOCOL_VERSION_MINOR), LogLevel_WARNING);
+
+    disconnect(DISCONNECT_STATUS_OUTDATED_CLIENT);
     return;
   }
 

@@ -57,6 +57,7 @@
 #define DISCONNECT_STATUS_OK 0
 #define DISCONNECT_STATUS_RECONNECT 1
 #define DISCONNECT_STATUS_OUTDATED_SERVER 2
+#define DISCONNECT_STATUS_OUTDATED_CLIENT 3
 
 typedef struct {
   int versionMajor;
@@ -69,6 +70,18 @@ typedef struct {
     ar(CEREAL_NVP(versionMajor), CEREAL_NVP(versionMinor), CEREAL_NVP(minimumVersionMajor), CEREAL_NVP(minimumVersionMinor));
   }
 } protocolPacket_t;
+
+typedef struct {
+  int statusCode;
+
+  int verisonMajor;
+  int versionMinor;
+
+  template <class Archive>
+  void serialize(Archive &ar) {
+    ar(CEREAL_NVP(statusCode), CEREAL_NVP(versionMajor), CEREAL_NVP(versionMinor));
+  }
+} protocolResponsePacket_t;
 
 typedef struct {
   uint16_t teamspeakId;
