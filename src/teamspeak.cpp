@@ -252,6 +252,10 @@ bool ts3_setNickname(std::string nickname) {
 }
 
 bool ts3_resetNickname() {
+  if (_serverConnectionHandler == 0) {
+    return false;
+  }
+
   if (_originalNickname.compare("") == 0) {
     return true;
   }
@@ -273,6 +277,10 @@ bool ts3_resetNickname() {
 }
 
 std::string ts3_getClientIdentity() {
+  if (_serverConnectionHandler == 0) {
+    return "";
+  }
+
   // get client unique identity
   char *identity;
   if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_UNIQUE_IDENTIFIER, &identity) != ERROR_ok) {

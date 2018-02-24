@@ -33,9 +33,9 @@
 #include <sstream>
 
 #define PROTOCOL_VERSION_MAJOR 1
-#define PROTOCOL_VERSION_MINOR 1
+#define PROTOCOL_VERSION_MINOR 2
 #define PROTOCOL_MIN_VERSION_MAJOR 1
-#define PROTOCOL_MIN_VERSION_MINOR 1
+#define PROTOCOL_MIN_VERSION_MINOR 2
 
 #define ENET_PORT 23332
 #define HTTP_PORT 23333
@@ -127,9 +127,11 @@ typedef struct {
   uint16_t teamspeakId;
   int statusCode;
 
+  std::string teamspeakClientUniqueIdentity;
+
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode));
+    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode), CEREAL_NVP(teamspeakClientUniqueIdentity));
   }
 } handshakePacket_t;
 

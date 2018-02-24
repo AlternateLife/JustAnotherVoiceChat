@@ -298,7 +298,7 @@ void Client::sendHandshake(int statusCode) {
   packet.teamspeakId = _teamspeakId;
   packet.statusCode = statusCode;
 
-  //packet.teamspeakClientIdentity = ts3_getClientIdentity();
+  packet.teamspeakClientUniqueIdentity = ts3_getClientIdentity();
 
   // serialize payload
   std::ostringstream os;
