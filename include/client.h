@@ -77,7 +77,7 @@ private:
   void sendStatus();
 
   void handleMessage(ENetEvent &event);
-  void handleProtocolResponse(ENetEvent &event);
+  void handleProtocolResponse(ENetPacket *packet);
   void handleHandshakeResponse(ENetPacket *packet);
   void handleUpdateMessage(ENetPacket *packet);
   void handleControlMessage(ENetPacket *packet);
