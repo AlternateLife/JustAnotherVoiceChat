@@ -375,18 +375,18 @@ void Client::handleProtocolResponse(ENetPacket *packet) {
     return;
   }
 
-  if (protocolPacket.statusCode != STATUS_CODE_OK) {
-    ts3_log("Client uses an outdated protocol version: " + std::to_string(PROTOCOL_VERSION_MAJOR) "." + std::to_string(PROTOCOL_VERSION_MINOR), LogLevel_WARNING);
-
-    disconnect(DISCONNECT_STATUS_OUTDATED_CLIENT);
-    return;
-  }
-
   // compare protocol versions
   if (verifyProtocolVersion(protocolPacket.versionMajor, protocolPacket.versionMinor, PROTOCOL_MIN_VERSION_MAJOR, PROTOCOL_MIN_VERSION_MINOR) == false) {
     ts3_log("Server uses an outdated protocol version: " + std::to_string(protocolPacket.versionMajor) + "." + std::to_string(protocolPacket.versionMinor), LogLevel_WARNING);
 
     disconnect(DISCONNECT_STATUS_OUTDATED_SERVER);
+    return;
+  }
+
+  if (protocolPacket.statusCode != STATUS_CODE_OK) {
+    ts3_log("Client uses an outdated protocol version: " + std::to_string(PROTOCOL_VERSION_MAJOR) + "." + std::to_string(PROTOCOL_VERSION_MINOR), LogLevel_WARNING);
+
+    disconnect(DISCONNECT_STATUS_OUTDATED_CLIENT);
     return;
   }
 
