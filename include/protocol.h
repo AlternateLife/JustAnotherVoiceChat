@@ -74,7 +74,7 @@ typedef struct {
 typedef struct {
   int statusCode;
 
-  int verisonMajor;
+  int versionMajor;
   int versionMinor;
 
   template <class Archive>
