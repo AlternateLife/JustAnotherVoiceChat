@@ -279,6 +279,8 @@ void Client::sendHandshake(int statusCode) {
   packet.protocolVersionMajor = PROTOCOL_VERSION_MAJOR;
   packet.protocolVersionMinor = PROTOCOL_VERSION_MINOR;
 
+  //packet.teamspeakClientIdentity = ts3_getClientIdentity();
+
   // serialize payload
   std::ostringstream os;
 

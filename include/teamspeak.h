@@ -42,6 +42,7 @@ bool ts3_unmuteAllClients();
 std::set<anyID> ts3_clientsInChannel(uint64 channelId);
 bool ts3_setNickname(std::string nickname);
 bool ts3_resetNickname();
+std::string ts3_getClientIdentity();
 
 uint64 ts3_serverConnectionHandle();
 anyID ts3_clientId(uint64 serverConnectionHandlerId);

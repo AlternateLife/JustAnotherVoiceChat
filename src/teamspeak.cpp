@@ -261,9 +261,26 @@ bool ts3_resetNickname() {
     return false;
   }
 
+  // update changes
+  if (ts3Functions.flushClientSelfUpdates(_serverConnectionHandler, NULL) != ERROR_ok) {
+    ts3_log("Error flushing client updates", LogLevel_ERROR);
+    return false;
+  }
+
   _originalNickname = "";
 
   return true;
+}
+
+std::string ts3_getClientIdentity() {
+  // get client unique identity
+  char *identity;
+  if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_UNIQUE_IDENTIFIER, &identity) != ERROR_ok) {
+    ts3_log("Unable to get client unique identity", LogLevel_ERROR);
+    return false;
+  }
+
+  return std::string(identity);
 }
 
 uint64 ts3_serverConnectionHandle() {
