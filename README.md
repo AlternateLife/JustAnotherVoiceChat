@@ -1,4 +1,4 @@
-# JustAnotherVoiceChat
+![JAVIC logo](docs/images/JAVIC_Wide_250px.png)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/gkt5ejc524w3ckja/branch/master?svg=true)](https://ci.appveyor.com/project/romanzipp/justanothervoicechat/branch/master)
 [![Build Status](https://travis-ci.org/AlternateLife/JustAnotherVoiceChat.svg?branch=master)](https://travis-ci.org/AlternateLife/JustAnotherVoiceChat)
@@ -31,6 +31,7 @@ Use the provided teamspeak 3 plugin package you can download in the release sect
 ## Authors
 
 * MarkAtk
+* jnkchris
 
 ## MIT license
 
