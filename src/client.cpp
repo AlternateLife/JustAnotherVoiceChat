@@ -91,7 +91,7 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
   _thread = new std::thread(&Client::update, this);
   ts3_log("Connection established", LogLevel_DEBUG);
 
-  sendHandshake();
+  sendProtocolMessage();
   return true;
 }
 
@@ -270,14 +270,33 @@ void Client::abortThread() {
   }
 }
 
+void Client::sendProtocolMessage() {
+  protocolPacket_t packet;
+  packet.versionMajor = PROTOCOL_VERSION_MAJOR;
+  packet.versionMinor = PROTOCOL_VERSION_MINOR;
+  packet.minimumVersionMajor = PROTOCOL_MIN_VERSION_MAJOR;
+  packet.minimumVersionMinor = PROTOCOL_MIN_VERSION_MINOR;
+
+  // serialize payload
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(std::string("sendProtocolMessage: ") + e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  auto data = os.str();
+  sendPacket((void *)data.c_str(), data.size(), NETWORK_PROTOCOL_CHANNEL);
+}
+
 void Client::sendHandshake(int statusCode) {
   handshakePacket_t packet;
   packet.gameId = _gameId;
   packet.teamspeakId = _teamspeakId;
   packet.statusCode = statusCode;
-  
-  packet.protocolVersionMajor = PROTOCOL_VERSION_MAJOR;
-  packet.protocolVersionMinor = PROTOCOL_VERSION_MINOR;
 
   //packet.teamspeakClientIdentity = ts3_getClientIdentity();
 
@@ -319,6 +338,10 @@ void Client::sendStatus() {
 
 void Client::handleMessage(ENetEvent &event) {
   switch (event.channelID) {
+    case NETWORK_PROTOCOL_CHANNEL:
+      handleProtocolResponse(event.packet);
+      break;
+
     case NETWORK_HANDSHAKE_CHANNEL:
       handleHandshakeResponse(event.packet);
       break;
@@ -335,6 +358,33 @@ void Client::handleMessage(ENetEvent &event) {
       ts3_log("Unknown message on channel " + std::to_string(event.channelID), LogLevel_INFO);
       break;
   }
+}
+
+void Client::handleProtocolResponse(ENetPacket *packet) {
+  // deserialize payload
+  protocolPacket_t protocolPacket;
+
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is(data);
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(protocolPacket);
+  } catch (std::exception &e) {
+    ts3_log(std::string("handleProtocolResponse: ") + e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  // compare protocol versions
+  if (verifyProtocolVersion(protocolPacket.protocolVersionMajor, protocolPacket.protocolVersionMinor) == false) {
+    ts3_log("Server uses an outdated protocol version: " + std::to_string(protocolPacket.protocolVersionMajor) + "." + std::to_string(protocolPacket.protocolVersionMinor), LogLevel_WARNING);
+
+    disconnect(DISCONNECT_STATUS_OUTDATED_SERVER);
+    return;
+  }
+
+  // protocol matches, send handshake
+  sendHandshake();
 }
 
 void Client::handleHandshakeResponse(ENetPacket *packet) {
@@ -354,15 +404,6 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
 
   if (responsePacket.statusCode != STATUS_CODE_OK) {
     ts3_log("Handshake failed: " + std::to_string(responsePacket.statusCode) + ": " + responsePacket.reason , LogLevel_WARNING);
-    return;
-  }
-
-  // compare protocol versions
-  if (verifyProtocolVersion(responsePacket.protocolVersionMajor, responsePacket.protocolVersionMinor) == false) {
-    ts3_log("Server uses an outdated protocol version: " + std::to_string(responsePacket.protocolVersionMajor) + "." + std::to_string(responsePacket.protocolVersionMinor), LogLevel_WARNING);
-    sendHandshake(STATUS_CODE_OUTDATED_PROTOCOL_VERSION);
-
-    disconnect(DISCONNECT_STATUS_OUTDATED_SERVER);
     return;
   }
 

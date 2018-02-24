@@ -72,9 +72,12 @@ private:
   void update();
   void abortThread();
 
+  void sendProtocolMessage();
   void sendHandshake(int statusCode = STATUS_CODE_OK);
   void sendStatus();
+
   void handleMessage(ENetEvent &event);
+  void handleProtocolResponse(ENetEvent &event);
   void handleHandshakeResponse(ENetPacket *packet);
   void handleUpdateMessage(ENetPacket *packet);
   void handleControlMessage(ENetPacket *packet);

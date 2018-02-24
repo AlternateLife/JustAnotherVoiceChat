@@ -41,10 +41,11 @@
 #define HTTP_PORT 23333
 
 #define NETWORK_CHANNELS 4
-#define NETWORK_HANDSHAKE_CHANNEL 0
-#define NETWORK_UPDATE_CHANNEL 1
-#define NETWORK_STATUS_CHANNEL 2
-#define NETWORK_CONTROL_CHANNEL 3
+#define NETWORK_PROTOCOL_CHANNEL 0
+#define NETWORK_HANDSHAKE_CHANNEL 1
+#define NETWORK_UPDATE_CHANNEL 2
+#define NETWORK_STATUS_CHANNEL 3
+#define NETWORK_CONTROL_CHANNEL 4
 
 #define STATUS_CODE_OK 0
 #define STATUS_CODE_UNKNOWN_ERROR 1
@@ -56,6 +57,18 @@
 #define DISCONNECT_STATUS_OK 0
 #define DISCONNECT_STATUS_RECONNECT 1
 #define DISCONNECT_STATUS_OUTDATED_SERVER 2
+
+typedef struct {
+  int versionMajor;
+  int versionMinor;
+  int minimumVersionMajor;
+  int minimumVersionMinor;
+
+  template <class Archive>
+  void serialize(Archive &ar) {
+    ar(CEREAL_NVP(versionMajor), CEREAL_NVP(versionMinor), CEREAL_NVP(minimumVersionMajor), CEREAL_NVP(minimumVersionMinor));
+  }
+} protocolPacket_t;
 
 typedef struct {
   uint16_t teamspeakId;
@@ -85,9 +98,6 @@ typedef struct {
   int statusCode;
   std::string reason;
 
-  int protocolVersionMajor;
-  int protocolVersionMinor;
-
   std::string teamspeakServerUniqueIdentifier;
 
   uint64_t channelId;
@@ -104,12 +114,9 @@ typedef struct {
   uint16_t teamspeakId;
   int statusCode;
 
-  int protocolVersionMajor;
-  int protocolVersionMinor;
-
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode), CEREAL_NVP(protocolVersionMajor), CEREAL_NVP(protocolVersionMinor));
+    ar(CEREAL_NVP(gameId), CEREAL_NVP(teamspeakId), CEREAL_NVP(statusCode));
   }
 } handshakePacket_t;
 
@@ -143,18 +150,18 @@ typedef struct {
   }
 } controlPacket_t;
 
-inline bool verifyProtocolVersion(int major, int minor) {
+inline bool verifyProtocolVersion(int major, int minor, int minMajor, int minMinor) {
   // check major number
-  if (major > PROTOCOL_MIN_VERSION_MAJOR) {
+  if (major > minMajor) {
     return true;
-  } else if (major < PROTOCOL_MIN_VERSION_MAJOR) {
+  } else if (major < minMajor) {
     return false;
   }
 
   // check minor number
-  if (minor > PROTOCOL_MIN_VERSION_MINOR) {
+  if (minor > minMinor) {
     return true;
-  } else if (minor < PROTOCOL_MIN_VERSION_MINOR) {
+  } else if (minor < minMinor) {
     return false;
   }
 
