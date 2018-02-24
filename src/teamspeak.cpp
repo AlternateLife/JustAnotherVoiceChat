@@ -223,22 +223,28 @@ bool ts3_setNickname(std::string nickname) {
     return false;
   }
 
-  char *originalNickname;
-  if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, &originalNickname) != ERROR_ok) {
+  char *currentNickname;
+  if (ts3Functions.getClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, &currentNickname) != ERROR_ok) {
     ts3_log("Unable to get original nickname", LogLevel_WARNING);
     _originalNickname = "";
     return false;
   }
 
-  if (_originalNickname.compare("") == 0) {
-    _originalNickname = std::string(originalNickname);
-  } else if (nickname.compare(originalNickname) == 0) {
+  if (nickname.compare(currentNickname) == 0) {
     return true;
+  } else if (_originalNickname.compare("") == 0) {
+    _originalNickname = std::string(currentNickname);
   }
 
   // set new nickname
   if (ts3Functions.setClientSelfVariableAsString(_serverConnectionHandler, CLIENT_NICKNAME, nickname.c_str()) != ERROR_ok) {
     ts3_log("Unable to rename client to " + nickname, LogLevel_WARNING);
+    return false;
+  }
+
+  // update changes
+  if (ts3Functions.flushClientSelfUpdates(_serverConnectionHandler, NULL) != ERROR_ok) {
+    ts3_log("Error flushing client updates", LogLevel_ERROR);
     return false;
   }
 

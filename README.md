@@ -1,6 +1,6 @@
 # JustAnotherVoiceChat
 
-[![Build status](https://ci.appveyor.com/api/projects/status/c8it8hcmhe6cjhpf/branch/master?svg=true)](https://ci.appveyor.com/project/markatk/justanothervoicechat/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/c8it8hcmhe6cjhpf/branch/master?svg=true)](https://ci.appveyor.com/project/romanzipp/justanothervoicechat/branch/master)
 [![Build Status](https://travis-ci.org/AlternateLife/JustAnotherVoiceChat.svg?branch=master)](https://travis-ci.org/AlternateLife/JustAnotherVoiceChat)
 
 ## Description
