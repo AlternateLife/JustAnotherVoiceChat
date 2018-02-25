@@ -1,6 +1,6 @@
 # Setup base project
 cmake_minimum_required(VERSION 3.5)
-project(JustAnotherVoiceChat VERSION 0.2.0.0 LANGUAGES CXX)
+project(JustAnotherVoiceChat VERSION 0.3.0.0 LANGUAGES CXX)
 
 # Setup basic C++ and project attributes
 set(CMAKE_CXX_STANDARD 11)
