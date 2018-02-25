@@ -46,6 +46,7 @@ std::string ts3_getClientIdentity();
 bool ts3_setClientPosition(anyID clientID, float x, float y, float z);
 bool ts3_resetListenerPosition();
 bool ts3_set3DSettings(float distanceFactor, float rolloffScale);
+void ts3_resetClients3DPositions();
 
 uint64 ts3_serverConnectionHandle();
 anyID ts3_clientId(uint64 serverConnectionHandlerId);

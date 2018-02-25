@@ -209,6 +209,8 @@ void Client::close() {
 
   _lastChannelId = 0;
 
+  ts3_resetClients3DPositions();
+
   // unmute all muted clients after moved out of channel and reset custom nickname
   ts3_unmuteAllClients();
   ts3_resetNickname();

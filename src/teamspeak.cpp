@@ -329,7 +329,7 @@ bool ts3_resetListenerPosition() {
   up.y = 0;
   up.z = 1;
 
-  if (ts3Functions.systemset3DListenerAttributes(_serverConnectionHandler, &position, &forward, &up) == false) {
+  if (ts3Functions.systemset3DListenerAttributes(_serverConnectionHandler, &position, &forward, &up) != ERROR_ok) {
     ts3_log("Unable to reset 3D system settings", LogLevel_WARNING);
     return false;
   }
@@ -348,6 +348,19 @@ bool ts3_set3DSettings(float distanceFactor, float rolloffScale) {
   }
 
   return true;
+}
+
+void ts3_resetClients3DPositions() {
+  if (_serverConnectionHandler == 0) {
+    return;
+  }
+
+  auto channelId = ts3_channelId(_serverConnectionHandler);
+  auto clients = ts3_clientsInChannel(channelId);
+
+  for (auto it = clients.begin(); it != clients.end(); it++) {
+    ts3_setClientPosition(*it, 0, 0, 0);
+  }
 }
 
 uint64 ts3_serverConnectionHandle() {

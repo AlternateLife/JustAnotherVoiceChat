@@ -128,17 +128,14 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
   // check if client moved into my channel
   auto ownChannel = ts3_channelId(serverConnectionHandlerID);
   if (ownChannel == newChannelID) {
-    ts3_log("Mute client on join", LogLevel_DEBUG);
     ts3_muteClient(clientID, true);
-    ts3_log("Muted joined client", LogLevel_DEBUG);
     return;
   }
 
   // check if client moved out of my channel
   if (ownChannel == oldChannelID) {
-    ts3_log("Unmute client on leave", LogLevel_DEBUG);
+    ts3_setClientPosition(clientID, 0, 0, 0);
     ts3_muteClient(clientID, false);
-    ts3_log("Unmuted left client", LogLevel_DEBUG);
     return;
   }
 }
