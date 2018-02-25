@@ -1,5 +1,11 @@
 # ChangeLog
 
+## 0.3.1
+
+ - Added 3D audio reset on disconnect
+ - Fixed 3D audio reset when other client moves out of game channel
+ - Fixed wrong log message on 3D system settings reset when connecting
+
 ## 0.3.0
 
  - Added 3D audio positioning using teamspeak 3D sound
