@@ -456,6 +456,7 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   sendStatus();
 
   ts3_resetListenerPosition();
+  ts3_set3DSettings(2.0f, 3.0f);
 }
 
 void Client::handleUpdateMessage(ENetPacket *packet) {

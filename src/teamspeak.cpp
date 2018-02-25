@@ -319,8 +319,31 @@ bool ts3_resetListenerPosition() {
   position.y = 0;
   position.z = 0;
 
-  if (ts3Functions.systemset3DListenerAttributes(_serverConnectionHandler, &position, NULL, NULL) == false) {
+  TS3_VECTOR forward;
+  forward.x = 0;
+  forward.y = 0;
+  forward.z = 0;
+
+  TS3_VECTOR up;
+  up.x = 0;
+  up.y = 0;
+  up.z = 1;
+
+  if (ts3Functions.systemset3DListenerAttributes(_serverConnectionHandler, &position, &forward, &up) == false) {
     ts3_log("Unable to reset 3D system settings", LogLevel_WARNING);
+    return false;
+  }
+
+  return true;
+}
+
+bool ts3_set3DSettings(float distanceFactor, float rolloffScale) {
+  if (_serverConnectionHandler == 0) {
+    return false;
+  }
+
+  if (ts3Functions.systemset3DSettings(_serverConnectionHandler, distanceFactor, rolloffScale) != ERROR_ok) {
+    ts3_log("Unable to set 3D system settings", LogLevel_DEBUG);
     return false;
   }
 
