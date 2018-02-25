@@ -43,11 +43,11 @@ std::set<anyID> ts3_clientsInChannel(uint64 channelId);
 bool ts3_setNickname(std::string nickname);
 bool ts3_resetNickname();
 std::string ts3_getClientIdentity();
+bool ts3_setClientPosition(anyID clientID, float x, float y, float z);
+bool ts3_resetListenerPosition();
 
 uint64 ts3_serverConnectionHandle();
 anyID ts3_clientId(uint64 serverConnectionHandlerId);
 uint64 ts3_channelId(uint64 serverConnectionHandlerId);
-void ts3_setClientVolumeModifier(anyID clientID, float value);
-void ts3_setClientPosition(anyID clientID, const struct TS3_Vector *position);
 bool ts3_isInputMuted(uint64 serverConnectionHandlerId);
 bool ts3_isOutputMuted(uint64 serverConnectionHandlerId);

@@ -33,19 +33,20 @@
 #include <sstream>
 
 #define PROTOCOL_VERSION_MAJOR 1
-#define PROTOCOL_VERSION_MINOR 2
+#define PROTOCOL_VERSION_MINOR 3
 #define PROTOCOL_MIN_VERSION_MAJOR 1
-#define PROTOCOL_MIN_VERSION_MINOR 2
+#define PROTOCOL_MIN_VERSION_MINOR 3
 
 #define ENET_PORT 23332
 #define HTTP_PORT 23333
 
-#define NETWORK_CHANNELS 5
+#define NETWORK_CHANNELS 6
 #define NETWORK_PROTOCOL_CHANNEL 0
 #define NETWORK_HANDSHAKE_CHANNEL 1
 #define NETWORK_UPDATE_CHANNEL 2
 #define NETWORK_STATUS_CHANNEL 3
 #define NETWORK_CONTROL_CHANNEL 4
+#define NETWORK_POSITION_CHANNEL 5
 
 #define STATUS_CODE_OK 0
 #define STATUS_CODE_UNKNOWN_ERROR 1
@@ -89,12 +90,27 @@ typedef struct {
   float x;
   float y;
   float z;
+  float voiceRange;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(teamspeakId), CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z));
+    ar(CEREAL_NVP(teamspeakId), CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z), CEREAL_NVP(voiceRange));
   }
 } clientPositionUpdate_t;
+
+typedef struct {
+  float x;
+  float y;
+  float z;
+  float rotation;
+
+  std::vector<clientPositionUpdate_t> positions;
+
+  template <class Archive>
+  void serialize(Archive &ar) {
+    ar(CEREAL_NVP(x), CEREAL_NVP(y), CEREAL_NVP(z), CEREAL_NVP(rotation), CEREAL_NVP(positions));
+  }
+} positionPacket_t;
 
 typedef struct {
   uint16_t teamspeakId;
@@ -137,12 +153,11 @@ typedef struct {
 } handshakePacket_t;
 
 typedef struct {
-  std::vector<clientPositionUpdate_t> positionUpdates;
   std::vector<clientAudioUpdate_t> audioUpdates;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(positionUpdates), CEREAL_NVP(audioUpdates));
+    ar(CEREAL_NVP(audioUpdates));
   }
 } updatePacket_t;
 

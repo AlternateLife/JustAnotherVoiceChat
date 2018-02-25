@@ -291,6 +291,24 @@ std::string ts3_getClientIdentity() {
   return std::string(identity);
 }
 
+bool ts3_setClientPosition(anyID clientId, float x, float y, float z) {
+  if (_serverConnectionHandler == 0) {
+    return false;
+  }
+
+  TS3_VECTOR position;
+  position.x = x;
+  position.y = y;
+  position.z = z;
+
+  if (ts3Functions.channelset3DAttributes(_serverConnectionHandler, clientId, &position) != ERROR_ok) {
+    ts3_log("Unable to set position for client " + std::to_string(clientId), LogLevel_WARNING);
+    return false;
+  }
+
+  return true;
+}
+
 uint64 ts3_serverConnectionHandle() {
   return _serverConnectionHandler;
 }
@@ -336,14 +354,6 @@ uint64 ts3_channelId(uint64 serverConnectionHandlerId) {
   }
 
   return channelId;
-}
-
-void ts3_setClientVolumeModifier(anyID, float ) {
-
-}
-
-void ts3_setClientPosition(anyID, const struct TS3_Vector *) {
-
 }
 
 bool ts3_isInputMuted(uint64 serverConnectionHandlerId) {

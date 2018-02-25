@@ -354,6 +354,10 @@ void Client::handleMessage(ENetEvent &event) {
       handleControlMessage(event.packet);
       break;
 
+    case NETWORK_POSITION_CHANNEL:
+      handlePositionMessage(event.packet);
+      break;
+
     default:
       ts3_log("Unknown message on channel " + std::to_string(event.channelID), LogLevel_INFO);
       break;
@@ -505,6 +509,36 @@ void Client::handleControlMessage(ENetPacket *packet) {
   // handle control packet
   if (controlPacket.nickname.compare("") != 0) {
     ts3_setNickname(controlPacket.nickname);
+  }
+}
+
+void Client::handlePositionMessage(ENetPacket *packet) {
+  // deserialize payload
+  positionPacket_t positionPacket;
+
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is(data);
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(positionPacket);
+  } catch (std::exception &e) {
+    ts3_log(std::string("handlePositionMessage: ") + e.what(), LogLevel_ERROR);
+    return;
+  }
+
+  // update all clients
+  for (auto it = positionPacket.positions.begin(); it != positionPacket.positions.end(); it++) {
+    float x = (*it).x - positionPacket.x;
+    float y = (*it).y - positionPacket.y;
+
+    float rotatedX = x * cos(positionPacket.rotation) - y * sin(positionPacket.rotation);
+    float rotatedY = x * sin(positionPacket.rotation) + y * cos(positionPacket.rotation);
+
+    rotatedX *= 10 / (*it).voiceRange;
+    rotatedY *= 10 / (*it).voiceRange;
+
+    ts3_setClientPosition((*it).teamspeakId, rotatedX, rotatedY, 0);
   }
 }
 
