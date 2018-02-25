@@ -309,6 +309,24 @@ bool ts3_setClientPosition(anyID clientId, float x, float y, float z) {
   return true;
 }
 
+bool ts3_resetListenerPosition() {
+  if (_serverConnectionHandler == 0) {
+    return false;
+  }
+
+  TS3_VECTOR position;
+  position.x = 0;
+  position.y = 0;
+  position.z = 0;
+
+  if (ts3Functions.systemset3DListenerAttributes(_serverConnectionHandler, &position, NULL, NULL) == false) {
+    ts3_log("Unable to reset 3D system settings", LogLevel_WARNING);
+    return false;
+  }
+
+  return true;
+}
+
 uint64 ts3_serverConnectionHandle() {
   return _serverConnectionHandler;
 }

@@ -454,6 +454,8 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   _speakersMuted = ts3_isOutputMuted(serverHandle);
 
   sendStatus();
+
+  ts3_resetListenerPosition();
 }
 
 void Client::handleUpdateMessage(ENetPacket *packet) {
