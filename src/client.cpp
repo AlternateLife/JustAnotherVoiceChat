@@ -492,6 +492,11 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
 
   ts3_muteClients(muteClients, true);
   ts3_muteClients(unmuteClients, false);
+
+  // handle position changes
+  for (auto it = updatePacket.positionUpdates.begin(); it != updatePacket.positionUpdates.end(); it++) {
+    ts3_setClientPosition((*it).teamspeakId, (*it).x, (*it).y, (*it).z);
+  }
 }
 
 void Client::handleControlMessage(ENetPacket *packet) {
@@ -532,16 +537,7 @@ void Client::handlePositionMessage(ENetPacket *packet) {
 
   // update all clients
   for (auto it = positionPacket.positions.begin(); it != positionPacket.positions.end(); it++) {
-    float x = (*it).x - positionPacket.x;
-    float y = (*it).y - positionPacket.y;
-
-    float rotatedX = x * cos(positionPacket.rotation) - y * sin(positionPacket.rotation);
-    float rotatedY = x * sin(positionPacket.rotation) + y * cos(positionPacket.rotation);
-
-    rotatedX *= 10 / (*it).voiceRange;
-    rotatedY *= 10 / (*it).voiceRange;
-
-    ts3_setClientPosition((*it).teamspeakId, rotatedX, rotatedY, 0);
+    ts3_setClientPosition((*it).teamspeakId, (*it).x, (*it).y, (*it).z);
   }
 }
 

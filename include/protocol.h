@@ -154,10 +154,11 @@ typedef struct {
 
 typedef struct {
   std::vector<clientAudioUpdate_t> audioUpdates;
+  std::vector<clientPositionUpdate_t> positionUpdates;
 
   template <class Archive>
   void serialize(Archive &ar) {
-    ar(CEREAL_NVP(audioUpdates));
+    ar(CEREAL_NVP(audioUpdates), CEREAL_NVP(positionUpdates));
   }
 } updatePacket_t;
 
