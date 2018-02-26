@@ -55,6 +55,8 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
     disconnect(DISCONNECT_STATUS_RECONNECT);
   }
 
+  ts3_log("Creating network client", LogLevel_DEBUG);
+
   _client = enet_host_create(NULL, 1, NETWORK_CHANNELS, 0, 0);
   if (_client == NULL) {
     _client = nullptr;
@@ -65,6 +67,8 @@ bool Client::connect(std::string host, uint16_t port, uint16_t uniqueIdentifier)
   ENetAddress address;
   enet_address_set_host(&address, host.c_str());
   address.port = port;
+
+  ts3_log("Connecting to voice server", LogLevel_DEBUG);
 
   _peer = enet_host_connect(_client, &address, NETWORK_CHANNELS, 0);
   if (_peer == NULL) {
@@ -99,6 +103,8 @@ void Client::disconnect(uint32_t status) {
   if (_peer == nullptr) {
     return;
   }
+
+  ts3_log("Disconnecting", LogLevel_DEBUG);
 
   enet_peer_disconnect(_peer, status);
 
@@ -166,6 +172,8 @@ bool Client::hasSpeakersMuted() const {
 }
 
 void Client::close() {
+  ts3_log("Closing", LogLevel_DEBUG);
+
   abortThread();
   
   if (_peer != nullptr) {
@@ -185,6 +193,8 @@ void Client::close() {
   _teamspeakId = 0;
 
   // move back to old teamspeak channel
+  ts3_log("Resetting teamspeak", LogLevel_DEBUG);
+
   if (_lastChannelId == 0) {
     return;
   }
@@ -214,6 +224,8 @@ void Client::close() {
   // unmute all muted clients after moved out of channel and reset custom nickname
   ts3_unmuteAllClients();
   ts3_resetNickname();
+
+  ts3_log("Closed", LogLevel_DEBUG);
 }
 
 void Client::update() {
@@ -437,6 +449,8 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   }
 
   // mute all clients by default
+  ts3_log("Muting all clients in channel", LogLevel_DEBUG);
+
   auto clients = ts3_clientsInChannel(responsePacket.channelId);
   for (auto it = clients.begin(); it != clients.end(); it++) {
     ts3_muteClient(*it, true);

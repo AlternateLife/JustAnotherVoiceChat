@@ -408,6 +408,7 @@ uint64 ts3_channelId(uint64 serverConnectionHandlerId) {
 
   auto result = ts3Functions.getChannelOfClient(serverConnectionHandlerId, clientId, &channelId);
   if (result != ERROR_ok) {
+    ts3_log("Unable to get current channel id: " + std::to_string(result), LogLevel_DEBUG);
     return 0;
   }
 
