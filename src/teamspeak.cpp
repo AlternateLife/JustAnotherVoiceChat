@@ -138,6 +138,8 @@ bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
         ts3_log("Add client to cached list " + std::to_string(*it), LogLevel_DEBUG);
         _mutedClients.insert(*it);
       }
+    } else {
+      ts3_log("Unable to mute clients", LogLevel_DEBUG);
     }
   } else {
     result = ts3Functions.requestUnmuteClients(_serverConnectionHandler, clientIds, NULL);
@@ -157,6 +159,8 @@ bool ts3_muteClients(std::set<anyID> &clients, bool mute) {
           }
         }
       }
+    } else {
+      ts3_log("Unable to unmute clients", LogLevel_DEBUG);
     }
   }
 

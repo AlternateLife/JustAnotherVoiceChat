@@ -438,11 +438,15 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
 
   // mute all clients by default
   auto clients = ts3_clientsInChannel(responsePacket.channelId);
-  if (ts3_muteClients(clients, true) == false) {
-    ts3_log("Unable to mute clients on joining channel " + std::to_string(responsePacket.channelId), LogLevel_WARNING);
-    sendHandshake(STATUS_CODE_UNABLE_TO_MUTE_CLIENTS);
-    return;
+  for (auto it = clients.begin(); it != clients.end(); it++) {
+    ts3_muteClient(*it, true);
   }
+
+  // if (ts3_muteClients(clients, true) == false) {
+  //   ts3_log("Unable to mute clients on joining channel " + std::to_string(responsePacket.channelId), LogLevel_WARNING);
+  //   sendHandshake(STATUS_CODE_UNABLE_TO_MUTE_CLIENTS);
+  //   return;
+  // }
 
   // connection on teamspeak server is valid, save teamspeak id
   _teamspeakId = ts3_clientId(serverHandle);
