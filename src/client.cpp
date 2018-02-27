@@ -446,7 +446,7 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   if (tempMute) {
     ts3_setOutputMuted(serverHandle, true);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
   
   if (ts3_moveToChannel(responsePacket.channelId, responsePacket.channelPassword) == false) {
@@ -464,7 +464,7 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   }
 
   if (tempMute) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     ts3_setOutputMuted(serverHandle, false);
   }
