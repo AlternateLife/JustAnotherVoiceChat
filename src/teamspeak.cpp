@@ -30,6 +30,9 @@
 #include "teamspeakPlugin.h"
 
 #include <stdlib.h>
+#include <thread>
+#include <chrono>
+#include <teamspeak/public_rare_definitions.h>
 
 #define BUFFER_LENGTH 256
 
@@ -202,8 +205,32 @@ std::set<anyID> ts3_clientsInChannel(uint64 channelId) {
   anyID *clientList;
   std::set<anyID> clients;
 
-  auto result = ts3Functions.getChannelClientList(_serverConnectionHandler, channelId, &clientList);
+  // subscribe to channel to be able to get clients 
+  uint64 channelIds[2];
+  channelIds[0] = channelId;
+  channelIds[1] = 0;
+
+  auto result = ts3Functions.requestChannelSubscribe(_serverConnectionHandler, channelIds, NULL);
   if (result != ERROR_ok) {
+    ts3_log("Unable to subscribe to channel " + std::to_string(channelId), LogLevel_WARNING);
+    return clients;
+  }
+
+  int isSubscribed;
+
+  do {
+    ts3_log("Wait for channel subscription", LogLevel_DEBUG);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    if (ts3Functions.getChannelVariableAsInt(_serverConnectionHandler, channelId, CHANNEL_FLAG_ARE_SUBSCRIBED, &isSubscribed) != ERROR_ok) {
+      ts3_log("Unable to get channel's subscrition state " + std::to_string(channelId), LogLevel_WARNING);
+      return clients;
+    }
+  } while(isSubscribed == false);
+
+  result = ts3Functions.getChannelClientList(_serverConnectionHandler, channelId, &clientList);
+  if (result != ERROR_ok) {
+    ts3_log("Unable to get clients for channel " + std::to_string(channelId), LogLevel_WARNING);
     return clients;
   }
 
