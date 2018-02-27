@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 0.3.2
+
+  - Added headphone mute while joining the in-game channel
+  - Added additional logging to improve error detection
+  - Improve client muting when joining the in-game channel
+  - Fixed muting clients when moving into unsubscribed in-game channel
+
 ## 0.3.1
 
  - Added 3D audio reset on disconnect
