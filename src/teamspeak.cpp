@@ -482,3 +482,18 @@ bool ts3_isOutputMuted(uint64 serverConnectionHandlerId) {
 
   return muted == MUTEOUTPUT_MUTED;
 }
+
+bool ts3_setOutputMuted(uint64 serverConnectionHandlerId, bool muted) {
+  if (ts3Functions.setClientSelfVariableAsInt(serverConnectionHandlerId, CLIENT_OUTPUT_MUTED, muted) != ERROR_ok) {
+    ts3_log("Unable to change client output mute", LogLevel_WARNING);
+    return false;
+  }
+
+  // update changes
+  if (ts3Functions.flushClientSelfUpdates(_serverConnectionHandler, NULL) != ERROR_ok) {
+    ts3_log("Error flushing client updates", LogLevel_ERROR);
+    return false;
+  }
+
+  return true;
+}

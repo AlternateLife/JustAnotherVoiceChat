@@ -53,3 +53,4 @@ anyID ts3_clientId(uint64 serverConnectionHandlerId);
 uint64 ts3_channelId(uint64 serverConnectionHandlerId);
 bool ts3_isInputMuted(uint64 serverConnectionHandlerId);
 bool ts3_isOutputMuted(uint64 serverConnectionHandlerId);
+bool ts3_setOutputMuted(uint64 serverConnectionHandlerId, bool muted);

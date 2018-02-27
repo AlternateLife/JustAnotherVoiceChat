@@ -441,6 +441,13 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   // save old channel for later use
   auto serverHandle =  ts3_serverConnectionHandle();
   auto lastChannelId = ts3_channelId(serverHandle);
+
+  bool tempMute = ts3_isOutputMuted(serverHandle) == false;
+  if (tempMute) {
+    ts3_setOutputMuted(serverHandle, true);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
   
   if (ts3_moveToChannel(responsePacket.channelId, responsePacket.channelPassword) == false) {
     ts3_log(std::string("Unable to move into channel ") + std::to_string(responsePacket.channelId), LogLevel_WARNING);
@@ -454,6 +461,12 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   auto clients = ts3_clientsInChannel(responsePacket.channelId);
   for (auto it = clients.begin(); it != clients.end(); it++) {
     ts3_muteClient(*it, true);
+  }
+
+  if (tempMute) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    ts3_setOutputMuted(serverHandle, false);
   }
 
   // if (ts3_muteClients(clients, true) == false) {
