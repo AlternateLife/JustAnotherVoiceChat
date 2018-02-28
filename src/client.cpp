@@ -295,6 +295,7 @@ void Client::sendProtocolMessage() {
   bool result = false;
   auto data = serializePacket<protocolPacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error serializing protocol packet", LogLevel_ERROR);
     return;
   }
 
@@ -313,6 +314,7 @@ void Client::sendHandshake(int statusCode) {
   bool result = false;
   auto data = serializePacket<handshakePacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error serializing handshake packet", LogLevel_ERROR);
     return;
   }
 
@@ -329,6 +331,7 @@ void Client::sendStatus() {
   bool result = false;
   auto data = serializePacket<statusPacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error serializing status packet", LogLevel_ERROR);
     return;
   }
 
@@ -368,6 +371,7 @@ void Client::handleProtocolResponse(ENetPacket *packet) {
   bool result = false;
   auto protocolPacket = deserializePacket<protocolResponsePacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error deserializing protocol response packet", LogLevel_ERROR);
     return;
   }
 
@@ -395,6 +399,7 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
   bool result = false;
   auto responsePacket = deserializePacket<handshakeResponsePacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error deserializing handshake response packet", LogLevel_ERROR);
     return;
   }
 
@@ -468,6 +473,7 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
   bool result = false;
   auto updatePacket = deserializePacket<updatePacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error deserializing update packet", LogLevel_ERROR);
     return;
   }
 
@@ -501,6 +507,7 @@ void Client::handleControlMessage(ENetPacket *packet) {
   bool result = false;
   auto controlPacket = deserializePacket<controlPacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error deserializing control packet", LogLevel_ERROR);
     return;
   }
 
@@ -515,6 +522,7 @@ void Client::handlePositionMessage(ENetPacket *packet) {
   bool result = false;
   auto positionPacket = deserializePacket<positionPacket_t>(packet, &result);
   if (result == false) {
+    ts3_log("Error deserializing position packet", LogLevel_ERROR);
     return;
   }
 

@@ -208,8 +208,6 @@ inline std::string serializePacket(T &packet, bool *result) {
     cereal::BinaryOutputArchive archive(os);
     archive(packet);
   } catch (std::exception &e) {
-    ts3_log(std::string("serializePacket: ") + e.what(), LogLevel_ERROR);
-
     if (result != nullptr) {
       *result = false;
     }
