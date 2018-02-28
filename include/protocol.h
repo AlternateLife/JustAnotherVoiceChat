@@ -233,8 +233,6 @@ inline T &deserializePacket(ENetPacket *packet, bool *result) {
     cereal::BinaryInputArchive archive(is);
     archive(outputPacket);
   } catch (std::exception &e) {
-    ts3_log(std::string("deserializePacket: ") + e.what(), LogLevel_ERROR);
-
     if (result != nullptr) {
       *result = false;
     }
