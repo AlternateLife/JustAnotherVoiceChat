@@ -292,17 +292,12 @@ void Client::sendProtocolMessage() {
   packet.minimumVersionMinor = PROTOCOL_MIN_VERSION_MINOR;
 
   // serialize payload
-  std::ostringstream os;
-
-  try {
-    cereal::BinaryOutputArchive archive(os);
-    archive(packet);
-  } catch (std::exception &e) {
-    ts3_log(std::string("sendProtocolMessage: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto data = serializePacket<protocolPacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
-  auto data = os.str();
   sendPacket((void *)data.c_str(), data.size(), NETWORK_PROTOCOL_CHANNEL);
 }
 
@@ -315,17 +310,12 @@ void Client::sendHandshake(int statusCode) {
   packet.teamspeakClientUniqueIdentity = ts3_getClientIdentity();
 
   // serialize payload
-  std::ostringstream os;
-
-  try {
-    cereal::BinaryOutputArchive archive(os);
-    archive(packet);
-  } catch (std::exception &e) {
-    ts3_log(std::string("sendHandshake: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto data = serializePacket<handshakePacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
-  auto data = os.str();
   sendPacket((void *)data.c_str(), data.size(), NETWORK_HANDSHAKE_CHANNEL);
 }
 
@@ -336,17 +326,12 @@ void Client::sendStatus() {
   packet.speakersMuted = _speakersMuted;
 
   // serialize payload
-  std::ostringstream os;
-
-  try {
-    cereal::BinaryOutputArchive archive(os);
-    archive(packet);
-  } catch (std::exception &e) {
-    ts3_log(std::string("sendStatus: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto data = serializePacket<statusPacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
-  auto data = os.str();
   sendPacket((void *)data.c_str(), data.size(), NETWORK_STATUS_CHANNEL);
 }
 
@@ -380,16 +365,9 @@ void Client::handleMessage(ENetEvent &event) {
 
 void Client::handleProtocolResponse(ENetPacket *packet) {
   // deserialize payload
-  protocolResponsePacket_t protocolPacket;
-
-  std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is(data);
-
-  try {
-    cereal::BinaryInputArchive archive(is);
-    archive(protocolPacket);
-  } catch (std::exception &e) {
-    ts3_log(std::string("handleProtocolResponse: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto protocolPacket = deserializePacket<protocolResponsePacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
@@ -414,16 +392,9 @@ void Client::handleProtocolResponse(ENetPacket *packet) {
 
 void Client::handleHandshakeResponse(ENetPacket *packet) {
   // deserialize payload
-  handshakeResponsePacket_t responsePacket;
-
-  std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is(data);
-
-  try {
-    cereal::BinaryInputArchive archive(is);
-    archive(responsePacket);
-  } catch (std::exception &e) {
-    ts3_log(std::string("handleHandshakeResponse: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto responsePacket = deserializePacket<handshakeResponsePacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
@@ -494,16 +465,9 @@ void Client::handleHandshakeResponse(ENetPacket *packet) {
 
 void Client::handleUpdateMessage(ENetPacket *packet) {
   // deserialize payload
-  updatePacket_t updatePacket;
-
-  std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is(data);
-
-  try {
-    cereal::BinaryInputArchive archive(is);
-    archive(updatePacket);
-  } catch (std::exception &e) {
-    ts3_log(std::string("handleUpdateMessage: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto updatePacket = deserializePacket<updatePacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
@@ -534,16 +498,9 @@ void Client::handleUpdateMessage(ENetPacket *packet) {
 
 void Client::handleControlMessage(ENetPacket *packet) {
   // deserialize payload
-  controlPacket_t controlPacket;
-
-  std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is(data);
-
-  try {
-    cereal::BinaryInputArchive archive(is);
-    archive(controlPacket);
-  } catch (std::exception &e) {
-    ts3_log(std::string("handleControlMessage: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto controlPacket = deserializePacket<controlPacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 
@@ -555,16 +512,9 @@ void Client::handleControlMessage(ENetPacket *packet) {
 
 void Client::handlePositionMessage(ENetPacket *packet) {
   // deserialize payload
-  positionPacket_t positionPacket;
-
-  std::string data((char *)packet->data, packet->dataLength);
-  std::istringstream is(data);
-
-  try {
-    cereal::BinaryInputArchive archive(is);
-    archive(positionPacket);
-  } catch (std::exception &e) {
-    ts3_log(std::string("handlePositionMessage: ") + e.what(), LogLevel_ERROR);
+  bool result = false;
+  auto positionPacket = deserializePacket<positionPacket_t>(packet, &result);
+  if (result == false) {
     return;
   }
 

@@ -199,3 +199,54 @@ inline bool verifyProtocolVersion(int major, int minor, int minMajor, int minMin
 
   return true;
 }
+
+template <class T>
+inline std::string serializePacket(T &packet, bool *result) {
+  std::ostringstream os;
+
+  try {
+    cereal::BinaryOutputArchive archive(os);
+    archive(packet);
+  } catch (std::exception &e) {
+    ts3_log(std::string("serializePacket: ") + e.what(), LogLevel_ERROR);
+
+    if (result != nullptr) {
+      *result = false;
+    }
+
+    return "";
+  }
+
+  if (result != nullptr) {
+    *result = true;
+  }
+
+  auto data = os.str();
+}
+
+template <class T>
+inline T &deserializePacket(ENetPacket *packet, bool *result) {
+  std::string data((char *)packet->data, packet->dataLength);
+  std::istringstream is(data);
+
+  T outputPacket;
+
+  try {
+    cereal::BinaryInputArchive archive(is);
+    archive(outputPacket);
+  } catch (std::exception &e) {
+    ts3_log(std::string("deserializePacket: ") + e.what(), LogLevel_ERROR);
+
+    if (result != nullptr) {
+      *result = false;
+    }
+
+    return outputPacket;
+  }
+
+  if (result != nullptr) {
+    *result = true;
+  }
+
+  return outputPacket;
+}
