@@ -7,6 +7,10 @@
 
 This is the teamspeak 3 plugin which connects to the JustAnotherVoiceChat server to control 3D voice communication.
 
+Feel free to join our Discord Server if you have any further questions.
+
+[![JAVIC Discord](https://discordapp.com/api/guilds/401509555684769802/embed.png?style=banner2)](https://discord.gg/uAVhvBT)
+
 ## Usage
 
 Use the provided teamspeak 3 plugin package you can download in the release section.
