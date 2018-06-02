@@ -16,7 +16,6 @@ git:
   submodules: false
 
 before_install:
-  - sed -i -e 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git config --global http.sslVerify "false"
   - git submodule update --init --recursive
   - git config --global http.sslVerify "true"
