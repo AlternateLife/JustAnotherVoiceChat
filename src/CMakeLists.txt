@@ -9,9 +9,7 @@ include(ExternalProject)
 # configure header files
 configure_file(../include/version.h.in ${JustAnotherVoiceChat_BINARY_DIR}/version.h @ONLY)
 
-file(GLOB SOURCES "./*.cpp")
-
-add_library(JustAnotherVoiceChat SHARED ${SOURCES})
+add_library(JustAnotherVoiceChat SHARED client.cpp httpServer.cpp justAnotherVoiceChat.cpp teamspeak.cpp teamspeakPlugin.cpp)
 
 # link external libraries
 target_link_libraries(JustAnotherVoiceChat enet)
