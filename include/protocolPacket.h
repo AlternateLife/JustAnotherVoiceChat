@@ -1,5 +1,5 @@
 /*
- * File: include/network/protocolPacket.h
+ * File: include/protocolPacket.h
  * Date: 20.07.2018
  *
  * MIT License

@@ -1,5 +1,5 @@
 /*
- * File: include/network/networkPacket.h
+ * File: include/networkPacket.h
  * Date: 13.02.2018
  *
  * MIT License

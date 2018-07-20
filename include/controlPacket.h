@@ -1,5 +1,5 @@
 /*
- * File: include/network/controlPacket.h
+ * File: include/controlPacket.h
  * Date: 20.07.2018
  *
  * MIT License

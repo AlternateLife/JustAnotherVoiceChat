@@ -1,5 +1,5 @@
 /*
- * File: include/network/positionPacket.h
+ * File: include/positionPacket.h
  * Date: 20.07.2018
  *
  * MIT License

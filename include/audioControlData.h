@@ -1,5 +1,5 @@
 /*
- * File: include/network/statusPacket.h
+ * File: include/audioControlData.h
  * Date: 20.07.2018
  *
  * MIT License
@@ -27,68 +27,64 @@
 
 #pragma once
 
-#include "networkPacket.h"
+#include <string>
 
 namespace javic {
-    typedef enum {
-        STATUS_PACKET_TYPE_UNKNOWN = 0,
-    } statusPacketType_t;
-
-    class StatusPacket : public NetworkPacket {
-    private:
-        bool _talking;
-        bool _microphoneMuted;
-        bool _speakersMuted;
+    class AudioControlData {
+    protected:
+        uint16_t _teamspeakId;
+        bool _muted;
+        float _volume;
+        std::string _filterKey;
 
     public:
-        StatusPacket() : NetworkPacket(STATUS_PACKET_TYPE_UNKNOWN) {
-            _talking = false;
-            _microphoneMuted = false;
-            _speakersMuted = false;
+        AudioControlData() {
+            _teamspeakId = 0;
+            _muted = 0;
+            _volume = 0;
+            _filterKey = "";
         }
 
-        StatusPacket(statusPacketType_t type) : NetworkPacket(type) {
-            _talking = false;
-            _microphoneMuted = false;
-            _speakersMuted = false;
+        void setTeamspeakId(uint16_t teamspeakId) {
+            _teamspeakId = teamspeakId;
         }
 
-        enet_uint8 channel() const override {
-            return PACKET_CHANNEL_STATUS;
+        uint16_t teamspeakId() const {
+            return _teamspeakId;
         }
 
-        void setTalking(bool talking) {
-            _talking = talking;
+        void setMuted(bool muted) {
+            _muted = muted;
         }
 
-        bool talking() const {
-            return _talking;
+        bool muted() const {
+            return _muted;
         }
 
-        void setMicrophoneMuted(bool microphoneMuted) {
-            _microphoneMuted = microphoneMuted;
+        void setVolume(float volume) {
+            _volume = volume;
         }
 
-        bool microphoneMuted() const {
-            return _microphoneMuted;
+        float volume() const {
+            return _volume;
         }
 
-        void setSpeakersMuted(bool speakersMuted) {
-            _speakersMuted = speakersMuted;
+        void setFilterKey(std::string filterKey) {
+            _filterKey = filterKey;
         }
 
-        bool speakersMuted() const {
-            return _speakersMuted;
+        std::string filterKey() const {
+            return _filterKey;
         }
 
         friend class cereal::access;
 
         template <class Archive>
         void serialize(Archive &ar) {
-            ar(CEREAL_NVP(_type),
-               CEREAL_NVP(_talking),
-               CEREAL_NVP(_microphoneMuted),
-               CEREAL_NVP(_speakersMuted)
+            ar(CEREAL_NVP(_teamspeakId),
+               CEREAL_NVP(_muted),
+               CEREAL_NVP(_volume),
+               CEREAL_NVP(_filterKey)
             );
         }
     };

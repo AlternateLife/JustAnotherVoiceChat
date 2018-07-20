@@ -1,5 +1,5 @@
 /*
- * File: include/network/positionData.h
+ * File: include/statusPacket.h
  * Date: 20.07.2018
  *
  * MIT License
@@ -27,75 +27,68 @@
 
 #pragma once
 
+#include "networkPacket.h"
+
 namespace javic {
-    class PositionData {
+    typedef enum {
+        STATUS_PACKET_TYPE_UNKNOWN = 0,
+    } statusPacketType_t;
+
+    class StatusPacket : public NetworkPacket {
     private:
-        uint16_t _teamspeakId;
-        float _x;
-        float _y;
-        float _z;
-        float _voiceRange;
+        bool _talking;
+        bool _microphoneMuted;
+        bool _speakersMuted;
 
     public:
-        PositionData() {
-            _teamspeakId = 0;
-            _x = 0;
-            _y = 0;
-            _z = 0;
-            _voiceRange = 0;
+        StatusPacket() : NetworkPacket(STATUS_PACKET_TYPE_UNKNOWN) {
+            _talking = false;
+            _microphoneMuted = false;
+            _speakersMuted = false;
         }
 
-        // TODO: Add Constructor with client pointer
-
-        void setTeamspeakId(uint16_t teamspeakId) {
-            _teamspeakId = teamspeakId;
+        StatusPacket(statusPacketType_t type) : NetworkPacket(type) {
+            _talking = false;
+            _microphoneMuted = false;
+            _speakersMuted = false;
         }
 
-        uint16_t teamspeakId() const {
-            return _teamspeakId;
+        enet_uint8 channel() const override {
+            return PACKET_CHANNEL_STATUS;
         }
 
-        void setX(float x) {
-            _x = x;
+        void setTalking(bool talking) {
+            _talking = talking;
         }
 
-        float x() const {
-            return _x;
+        bool talking() const {
+            return _talking;
         }
 
-        void setY(float y) {
-            _y = y;
+        void setMicrophoneMuted(bool microphoneMuted) {
+            _microphoneMuted = microphoneMuted;
         }
 
-        float y() const {
-            return _y;
+        bool microphoneMuted() const {
+            return _microphoneMuted;
         }
 
-        void setZ(float z) {
-            _z = z;
+        void setSpeakersMuted(bool speakersMuted) {
+            _speakersMuted = speakersMuted;
         }
 
-        float z() const {
-            return _z;
-        }
-
-        void setVoiceRange(float voiceRange) {
-            _voiceRange = voiceRange;
-        }
-
-        float voiceRange() const {
-            return _voiceRange;
+        bool speakersMuted() const {
+            return _speakersMuted;
         }
 
         friend class cereal::access;
 
         template <class Archive>
         void serialize(Archive &ar) {
-            ar(CEREAL_NVP(_teamspeakId),
-               CEREAL_NVP(_x),
-               CEREAL_NVP(_y),
-               CEREAL_NVP(_z),
-               CEREAL_NVP(_voiceRange)
+            ar(CEREAL_NVP(_type),
+               CEREAL_NVP(_talking),
+               CEREAL_NVP(_microphoneMuted),
+               CEREAL_NVP(_speakersMuted)
             );
         }
     };

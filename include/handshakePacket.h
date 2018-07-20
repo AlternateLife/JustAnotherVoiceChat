@@ -1,5 +1,5 @@
 /*
- * File: include/network/handshakePacket.h
+ * File: include/handshakePacket.h
  * Date: 20.07.2018
  *
  * MIT License

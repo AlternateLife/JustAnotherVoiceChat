@@ -32,56 +32,59 @@
 #include <string>
 #include <thread>
 
-#include "network/networkPacket.h"
+#include "networkPacket.h"
 
-class Client {
-private:
-  ENetHost *_client;
-  ENetPeer *_peer;
+namespace javic {
+    class Client {
+    private:
+        ENetHost *_client;
+        ENetPeer *_peer;
 
-  std::thread *_thread;
-  bool _running;
-  uint16_t _gameId;
-  uint16_t _teamspeakId;
-  std::string _host;
-  uint16_t _port;
-  uint64_t _lastChannelId;
+        std::thread *_thread;
+        bool _running;
+        uint16_t _gameId;
+        uint16_t _teamspeakId;
+        std::string _host;
+        uint16_t _port;
+        uint64_t _lastChannelId;
 
-  bool _talking;
-  bool _microphoneMuted;
-  bool _speakersMuted;
+        bool _talking;
+        bool _microphoneMuted;
+        bool _speakersMuted;
 
-public:
-  Client();
-  virtual ~Client();
+    public:
+        Client();
+        virtual ~Client();
 
-  bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
-  void disconnect(uint32_t status = DISCONNECT_STATUS_OK);
-  bool isOpen() const;
-  bool isIngame() const;
+        bool connect(std::string host, uint16_t port, uint16_t uniqueIdentifier);
+        void disconnect(uint32_t status = DISCONNECT_STATUS_OK);
+        bool isOpen() const;
+        bool isIngame() const;
 
-  void setTalking(bool talking);
-  void setMicrophoneMuted(bool muted);
-  void setSpeakersMuted(bool muted);
-  bool isTalking() const;
-  bool hasMicrophoneMuted() const;
-  bool hasSpeakersMuted() const;
+        void setTalking(bool talking);
+        void setMicrophoneMuted(bool muted);
+        void setSpeakersMuted(bool muted);
+        bool isTalking() const;
+        bool hasMicrophoneMuted() const;
+        bool hasSpeakersMuted() const;
 
-private:
-  void close();
-  void update();
-  void abortThread();
+    private:
+        void close();
+        void update();
+        void abortThread();
 
-  void sendProtocolMessage();
-  void sendHandshake(int statusCode = STATUS_CODE_OK);
-  void sendStatus();
+        void sendProtocolMessage();
+        void sendHandshake(int statusCode = STATUS_CODE_OK);
+        void sendStatus();
 
-  void handleMessage(ENetEvent &event);
-  void handleProtocolResponse(ENetPacket *packet);
-  void handleHandshakeResponse(ENetPacket *packet);
-  void handleUpdateMessage(ENetPacket *packet);
-  void handleControlMessage(ENetPacket *packet);
-  void handlePositionMessage(ENetPacket *packet);
+        void handleMessage(ENetEvent &event);
+        void handleProtocolResponse(ENetPacket *packet);
+        void handleHandshakeResponse(ENetPacket *packet);
+        void handleUpdateMessage(ENetPacket *packet);
+        void handleControlMessage(ENetPacket *packet);
+        void handlePositionMessage(ENetPacket *packet);
 
-  void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
-};
+        void sendPacket(void *data, size_t length, int channelId, bool reliable = true);
+    };
+
+}

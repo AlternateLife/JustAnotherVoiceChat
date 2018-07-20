@@ -1,5 +1,5 @@
 /*
- * File: include/network/audioControlData.h
+ * File: include/positionData.h
  * Date: 20.07.2018
  *
  * MIT License
@@ -27,23 +27,25 @@
 
 #pragma once
 
-#include <string>
-
 namespace javic {
-    class AudioControlData {
-    protected:
+    class PositionData {
+    private:
         uint16_t _teamspeakId;
-        bool _muted;
-        float _volume;
-        std::string _filterKey;
+        float _x;
+        float _y;
+        float _z;
+        float _voiceRange;
 
     public:
-        AudioControlData() {
+        PositionData() {
             _teamspeakId = 0;
-            _muted = 0;
-            _volume = 0;
-            _filterKey = "";
+            _x = 0;
+            _y = 0;
+            _z = 0;
+            _voiceRange = 0;
         }
+
+        // TODO: Add Constructor with client pointer
 
         void setTeamspeakId(uint16_t teamspeakId) {
             _teamspeakId = teamspeakId;
@@ -53,28 +55,36 @@ namespace javic {
             return _teamspeakId;
         }
 
-        void setMuted(bool muted) {
-            _muted = muted;
+        void setX(float x) {
+            _x = x;
         }
 
-        bool muted() const {
-            return _muted;
+        float x() const {
+            return _x;
         }
 
-        void setVolume(float volume) {
-            _volume = volume;
+        void setY(float y) {
+            _y = y;
         }
 
-        float volume() const {
-            return _volume;
+        float y() const {
+            return _y;
         }
 
-        void setFilterKey(std::string filterKey) {
-            _filterKey = filterKey;
+        void setZ(float z) {
+            _z = z;
         }
 
-        std::string filterKey() const {
-            return _filterKey;
+        float z() const {
+            return _z;
+        }
+
+        void setVoiceRange(float voiceRange) {
+            _voiceRange = voiceRange;
+        }
+
+        float voiceRange() const {
+            return _voiceRange;
         }
 
         friend class cereal::access;
@@ -82,9 +92,10 @@ namespace javic {
         template <class Archive>
         void serialize(Archive &ar) {
             ar(CEREAL_NVP(_teamspeakId),
-               CEREAL_NVP(_muted),
-               CEREAL_NVP(_volume),
-               CEREAL_NVP(_filterKey)
+               CEREAL_NVP(_x),
+               CEREAL_NVP(_y),
+               CEREAL_NVP(_z),
+               CEREAL_NVP(_voiceRange)
             );
         }
     };
