@@ -35,7 +35,7 @@
 #include <WS2tcpip.h>
 #endif
 
-#include "protocol.h"
+#include "network/networkPacket.h"
 #include "httpServer.h"
 #include "teamspeak.h"
 #include "client.h"

@@ -32,7 +32,7 @@
 #include <string>
 #include <thread>
 
-#include "protocol.h"
+#include "network/networkPacket.h"
 
 class Client {
 private:

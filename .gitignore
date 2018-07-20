@@ -1,6 +1,10 @@
 # CMake
 build/
+cmake-build-debug/
 
 # VS Code
 .vscode/
 *.code-workspace
+
+# CLion
+.idea/
