@@ -1,5 +1,5 @@
 /*
- * File: include/updatePacket.h
+ * File: include/statusPacket.h
  * Date: 20.07.2018
  *
  * MIT License
@@ -28,39 +28,58 @@
 #pragma once
 
 #include "networkPacket.h"
-#include "positionData.h"
-#include "packets/audioControlData.h"
 
 namespace javic {
-    namespace packets {
+    namespace network {
         typedef enum {
-            UPDATE_PACKET_TYPE_UNKNOWN = 0,
-        } updatePacketType_t;
+            STATUS_PACKET_TYPE_UNKNOWN = 0,
+        } statusPacketType_t;
 
-        class UpdatePacket : public NetworkPacket {
-        protected:
-            std::vector<std::shared_ptr<AudioControlData>> _audioUpdates;
-            std::vector<std::shared_ptr<PositionData>> _positionUpdates;
+        class StatusPacket : public NetworkPacket {
+        private:
+            bool _talking;
+            bool _microphoneMuted;
+            bool _speakersMuted;
 
         public:
-            UpdatePacket() : NetworkPacket(UPDATE_PACKET_TYPE_UNKNOWN) {
-
+            StatusPacket() : NetworkPacket(STATUS_PACKET_TYPE_UNKNOWN) {
+                _talking = false;
+                _microphoneMuted = false;
+                _speakersMuted = false;
             }
 
-            void addAudioControlData(std::shared_ptr<AudioControlData> audioControlData) {
-                _audioUpdates.push_back(audioControlData);
+            StatusPacket(statusPacketType_t type) : NetworkPacket(type) {
+                _talking = false;
+                _microphoneMuted = false;
+                _speakersMuted = false;
             }
 
-            std::vector<std::shared_ptr<AudioControlData>> audioUpdates() const {
-                return _audioUpdates;
+            enet_uint8 channel() const override {
+                return PACKET_CHANNEL_STATUS;
             }
 
-            void addPositionData(std::shared_ptr<PositionData> positionData) {
-                _positionUpdates.push_back(positionData);
+            void setTalking(bool talking) {
+                _talking = talking;
             }
 
-            std::vector<std::shared_ptr<PositionData>> positionUpdates() const {
-                return _positionUpdates;
+            bool talking() const {
+                return _talking;
+            }
+
+            void setMicrophoneMuted(bool microphoneMuted) {
+                _microphoneMuted = microphoneMuted;
+            }
+
+            bool microphoneMuted() const {
+                return _microphoneMuted;
+            }
+
+            void setSpeakersMuted(bool speakersMuted) {
+                _speakersMuted = speakersMuted;
+            }
+
+            bool speakersMuted() const {
+                return _speakersMuted;
             }
 
             friend class cereal::access;
@@ -68,8 +87,9 @@ namespace javic {
             template<class Archive>
             void serialize(Archive &ar) {
                 ar(CEREAL_NVP(_type),
-                   CEREAL_NVP(_audioUpdates),
-                   CEREAL_NVP(_positionUpdates)
+                   CEREAL_NVP(_talking),
+                   CEREAL_NVP(_microphoneMuted),
+                   CEREAL_NVP(_speakersMuted)
                 );
             }
         };

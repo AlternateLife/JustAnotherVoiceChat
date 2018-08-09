@@ -52,7 +52,7 @@
 #define DISCONNECT_STATUS_REJECTED 4
 
 namespace javic {
-    namespace packets {
+    namespace network {
         const enet_uint8 PACKET_CHANNELS = 6;
         const enet_uint8 PACKET_CHANNEL_PROTOCOL = 0;
         const enet_uint8 PACKET_CHANNEL_HANDSHAKE = 1;

@@ -30,7 +30,7 @@
 #include <string>
 
 namespace javic {
-    namespace packets {
+    namespace network {
         class AudioControlData {
         protected:
             uint16_t _teamspeakId;

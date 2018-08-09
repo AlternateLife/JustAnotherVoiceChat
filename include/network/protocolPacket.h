@@ -30,7 +30,7 @@
 #include "networkPacket.h"
 
 namespace javic {
-    namespace packets {
+    namespace network {
         const enet_uint8 PROTOCOL_VERSION_MAJOR = 2;
         const enet_uint8 PROTOCOL_VERSION_MINOR = 0;
         const enet_uint8 PROTOCOL_MIN_VERSION_MAJOR = 2;

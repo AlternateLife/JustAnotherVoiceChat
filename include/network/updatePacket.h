@@ -1,5 +1,5 @@
 /*
- * File: include/positionData.h
+ * File: include/updatePacket.h
  * Date: 20.07.2018
  *
  * MIT License
@@ -27,76 +27,49 @@
 
 #pragma once
 
+#include "networkPacket.h"
+#include "positionData.h"
+#include "audioControlData.h"
+
 namespace javic {
-    namespace packets {
-        class PositionData {
-        private:
-            uint16_t _teamspeakId;
-            float _x;
-            float _y;
-            float _z;
-            float _voiceRange;
+    namespace network {
+        typedef enum {
+            UPDATE_PACKET_TYPE_UNKNOWN = 0,
+        } updatePacketType_t;
+
+        class UpdatePacket : public NetworkPacket {
+        protected:
+            std::vector<std::shared_ptr<AudioControlData>> _audioUpdates;
+            std::vector<std::shared_ptr<PositionData>> _positionUpdates;
 
         public:
-            PositionData() {
-                _teamspeakId = 0;
-                _x = 0;
-                _y = 0;
-                _z = 0;
-                _voiceRange = 0;
+            UpdatePacket() : NetworkPacket(UPDATE_PACKET_TYPE_UNKNOWN) {
+
             }
 
-            // TODO: Add Constructor with client pointer
-
-            void setTeamspeakId(uint16_t teamspeakId) {
-                _teamspeakId = teamspeakId;
+            void addAudioControlData(std::shared_ptr<AudioControlData> audioControlData) {
+                _audioUpdates.push_back(audioControlData);
             }
 
-            uint16_t teamspeakId() const {
-                return _teamspeakId;
+            std::vector<std::shared_ptr<AudioControlData>> audioUpdates() const {
+                return _audioUpdates;
             }
 
-            void setX(float x) {
-                _x = x;
+            void addPositionData(std::shared_ptr<PositionData> positionData) {
+                _positionUpdates.push_back(positionData);
             }
 
-            float x() const {
-                return _x;
-            }
-
-            void setY(float y) {
-                _y = y;
-            }
-
-            float y() const {
-                return _y;
-            }
-
-            void setZ(float z) {
-                _z = z;
-            }
-
-            float z() const {
-                return _z;
-            }
-
-            void setVoiceRange(float voiceRange) {
-                _voiceRange = voiceRange;
-            }
-
-            float voiceRange() const {
-                return _voiceRange;
+            std::vector<std::shared_ptr<PositionData>> positionUpdates() const {
+                return _positionUpdates;
             }
 
             friend class cereal::access;
 
             template<class Archive>
             void serialize(Archive &ar) {
-                ar(CEREAL_NVP(_teamspeakId),
-                   CEREAL_NVP(_x),
-                   CEREAL_NVP(_y),
-                   CEREAL_NVP(_z),
-                   CEREAL_NVP(_voiceRange)
+                ar(CEREAL_NVP(_type),
+                   CEREAL_NVP(_audioUpdates),
+                   CEREAL_NVP(_positionUpdates)
                 );
             }
         };

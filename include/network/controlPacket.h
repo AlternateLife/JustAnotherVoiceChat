@@ -30,7 +30,7 @@
 #include "networkPacket.h"
 
 namespace javic {
-    namespace packets {
+    namespace network {
         typedef enum {
             CONTROL_PACKET_TYPE_UNKNOWN = 0,
         } controlPacketType_t;

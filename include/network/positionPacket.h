@@ -34,7 +34,7 @@
 #include <vector>
 
 namespace javic {
-    namespace packets {
+    namespace network {
         typedef enum {
             POSITION_PACKET_TYPE_UNKNOWN = 0,
         } positionPacketType_t;
