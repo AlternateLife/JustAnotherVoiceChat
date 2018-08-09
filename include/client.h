@@ -32,7 +32,7 @@
 #include <string>
 #include <thread>
 
-#include "networkPacket.h"
+#include "packets/networkPacket.h"
 
 namespace javic {
     class Client {

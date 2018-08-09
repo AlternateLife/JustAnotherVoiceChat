@@ -30,42 +30,44 @@
 #include "networkPacket.h"
 
 namespace javic {
-    typedef enum {
-        CONTROL_PACKET_TYPE_UNKNOWN = 0,
-    } controlPacketType_t;
+    namespace packets {
+        typedef enum {
+            CONTROL_PACKET_TYPE_UNKNOWN = 0,
+        } controlPacketType_t;
 
-    class ControlPacket : public NetworkPacket {
-    private:
-        std::string _nickname;
+        class ControlPacket : public NetworkPacket {
+        private:
+            std::string _nickname;
 
-    public:
-        ControlPacket() : NetworkPacket(CONTROL_PACKET_TYPE_UNKNOWN) {
-            _nickname = "";
-        }
+        public:
+            ControlPacket() : NetworkPacket(CONTROL_PACKET_TYPE_UNKNOWN) {
+                _nickname = "";
+            }
 
-        ControlPacket(controlPacketType_t type) : NetworkPacket(type) {
-            _nickname = "";
-        }
+            ControlPacket(controlPacketType_t type) : NetworkPacket(type) {
+                _nickname = "";
+            }
 
-        enet_uint8 channel() const override {
-            return PACKET_CHANNEL_CONTROL;
-        }
+            enet_uint8 channel() const override {
+                return PACKET_CHANNEL_CONTROL;
+            }
 
-        void setNickname(std::string nickname) {
-            _nickname = nickname;
-        }
+            void setNickname(std::string nickname) {
+                _nickname = nickname;
+            }
 
-        std::string nickname() const {
-            return _nickname;
-        }
+            std::string nickname() const {
+                return _nickname;
+            }
 
-        friend class cereal::access;
+            friend class cereal::access;
 
-        template <class Archive>
-        void serialize(Archive &ar) {
-            ar(CEREAL_NVP(_type),
-               CEREAL_NVP(_nickname)
-            );
-        }
-    };
+            template<class Archive>
+            void serialize(Archive &ar) {
+                ar(CEREAL_NVP(_type),
+                   CEREAL_NVP(_nickname)
+                );
+            }
+        };
+    }
 }
