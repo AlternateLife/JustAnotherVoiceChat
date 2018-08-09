@@ -98,7 +98,7 @@ bool javic::network::Client::sendPacket(std::shared_ptr<javic::network::NetworkP
 }
 
 void javic::network::Client::update() {
-    
+
 }
 
 void javic::network::Client::close() {
