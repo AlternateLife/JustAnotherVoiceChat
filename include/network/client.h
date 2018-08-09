@@ -1,6 +1,6 @@
 /*
  * File: include/network/client.h
- * Date: 20.07.2018
+ * Date: 09.08.2018
  *
  * MIT License
  *
@@ -32,6 +32,8 @@
 
 #include <enet/enet.h>
 
+#include "networkPacket.h"
+
 namespace javic {
     namespace network {
         class Client {
@@ -43,16 +45,18 @@ namespace javic {
 
         public:
             Client();
-            virtual ~Client();
+            virtual ~Client() = default;
 
             bool connect(std::string host, uint16_t port);
             void disconnect();
-            bool isOpen() const;
+            bool isConnected() const;
 
             bool sendPacket(std::shared_ptr<NetworkPacket> packet);
 
         private:
             void update();
+
+            void close();
         };
     }
 }
