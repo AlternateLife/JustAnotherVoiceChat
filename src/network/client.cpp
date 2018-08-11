@@ -28,11 +28,15 @@
 #include "network/client.h"
 
 #include "teamspeak.h"
+#include "taskRunner.h"
 
 javic::network::Client::Client() {
     _host = nullptr;
     _peer = nullptr;
     _thread = nullptr;
+    _stopped = true;
+
+    _taskRunner = std::make_shared<TaskRunner>();
 }
 
 bool javic::network::Client::connect(std::string host, uint16_t port) {
@@ -42,7 +46,7 @@ bool javic::network::Client::connect(std::string host, uint16_t port) {
         return true;
     }
 
-    _host = enet_host_create(NULL, 1, PACKET_CHANNELS, 0, 0);
+    _host = enet_host_create(nullptr, 1, PACKET_CHANNELS, 0, 0);
     if (_host == nullptr) {
         ts3_log("Unable to create network host", LogLevel_ERROR);
 
@@ -76,6 +80,7 @@ bool javic::network::Client::connect(std::string host, uint16_t port) {
     }
 
     // create network thread
+    _stopped = false;
     _thread = std::make_shared<std::thread>(&Client::update, this);
 
     ts3_log("Connection established", LogLevel_DEBUG);
@@ -86,21 +91,145 @@ bool javic::network::Client::connect(std::string host, uint16_t port) {
 }
 
 void javic::network::Client::disconnect() {
+    if (_peer == nullptr) {
+        return;
+    }
 
+    ts3_log("Disconnecting", LogLevel_DEBUG);
+
+    stopThread();
+
+    // graceful disconnect
+    enet_peer_disconnect(_peer, 0);
+
+    ENetEvent event;
+    bool disconnected = false;
+
+    while (_host != nullptr && enet_host_service(_host, &event, 3000) > 0) {
+        if (event.type == ENET_EVENT_TYPE_DISCONNECT) {
+            disconnected = true;
+            break;
+        }
+
+        if (event.packet != 0) {
+            enet_packet_destroy(event.packet);
+        }
+    }
+
+    if (disconnected) {
+        ts3_log("Successful disconnected", LogLevel_DEBUG);
+    } else {
+        ts3_log("Disconnecting timed out", LogLevel_WARNING);
+    }
+
+    close();
 }
 
 bool javic::network::Client::isConnected() const {
-
+    return _host != nullptr && _peer != nullptr && _stopped == false;
 }
 
 bool javic::network::Client::sendPacket(std::shared_ptr<javic::network::NetworkPacket> packet) {
+    auto task = std::make_shared<ResultTask<bool>>([this, packet]() {
+        bool result = false;
+        auto data = packet->serialize(&result);
+        if (result == false) {
+            ts3_log("Error serializing network packet", LogLevel_ERROR);
 
+            return false;
+        }
+
+        enet_uint32 flags = 0;
+        if (packet->reliable()) {
+            flags |= ENET_PACKET_FLAG_RELIABLE;
+        }
+
+        auto rawPacket = enet_packet_create(data.c_str(), data.length(), flags);
+        enet_peer_send(_peer, packet->channel(), rawPacket);
+
+        return true;
+    });
+
+    return _taskRunner->runTask(task);
 }
 
 void javic::network::Client::update() {
+    while (_stopped == false) {
+        handleEvents();
 
+        _taskRunner->update();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    ts3_log("Network thread stopped", LogLevel_INFO);
+}
+
+void javic::network::Client::handleEvents() {
+    if (_host == nullptr) {
+        return;
+    }
+
+    ENetEvent event;
+    auto code = enet_host_service(_host, &event, 100);
+    if (code < 0) {
+        ts3_log("Network error: " + std::to_string(code), LogLevel_WARNING);
+
+        // TODO: Stop network thread?
+
+        return;
+    }
+
+    if (code == 0) {
+        return;
+    }
+
+    switch (event.type) {
+        case ENET_EVENT_TYPE_DISCONNECT:
+
+            break;
+
+        case ENET_EVENT_TYPE_RECEIVE:
+
+            break;
+
+        default:
+            break;
+    }
 }
 
 void javic::network::Client::close() {
+    ts3_log("Closing network client", LogLevel_DEBUG);
 
+    stopThread();
+
+    if (_peer != nullptr) {
+        enet_peer_reset(_peer);
+        _peer = nullptr;
+    }
+
+    if (_host != nullptr) {
+        enet_host_destroy(_host);
+        _host = nullptr;
+    }
+
+    ts3_log("Closed network client", LogLevel_DEBUG);
+}
+
+void javic::network::Client::stopThread() {
+    if (_thread == nullptr) {
+        return;
+    }
+
+    if (_thread->get_id() == std::this_thread::get_id()) {
+        return;
+    }
+
+    _stopped = true;
+
+    if (_thread->joinable()) {
+        _thread->join();
+    }
+
+    _thread = nullptr;
 }

@@ -35,6 +35,8 @@
 #include "networkPacket.h"
 
 namespace javic {
+    class TaskRunner;
+
     namespace network {
         class Client {
         private:
@@ -42,6 +44,8 @@ namespace javic {
             ENetPeer *_peer;
 
             std::shared_ptr<std::thread> _thread;
+            std::shared_ptr<TaskRunner> _taskRunner;
+            bool _stopped;
 
         public:
             Client();
@@ -55,8 +59,10 @@ namespace javic {
 
         private:
             void update();
+            void handleEvents();
 
             void close();
+            void stopThread();
         };
     }
 }
